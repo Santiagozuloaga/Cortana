@@ -30,11 +30,22 @@ Ejemplos:
 ## Reglas de Programación
 
 - **Lenguaje**: Python 3.12+
+- **Shell**: Windows PowerShell (todos los comandos deben ser PowerShell)
 - **Estilo**: Limpio, comentado bajo ISO-SAGE
 - **Jerarquía**: Siempre aplicar P.A.R.A.
 - **Independencia**: Nunca mezclar lógica de negocio con configuración de entorno
   - Configuración → 00_SOPORTE/
   - Lógica de negocio → 01_SRC/
+
+## Comandos PowerShell
+
+Todos los comandos deben ser PowerShell:
+- Usar `cd` sin comillas para cambiar directorio
+- Usar `Get-ChildItem` en lugar de `ls`
+- Usar `Remove-Item` en lugar de `rm`
+- Usar `Copy-Item` en lugar de `cp`
+- Usar `Move-Item` en lugar de `mv`
+- Usar backticks `` ` `` para continuar líneas largas
 
 ## Seguridad Física
 

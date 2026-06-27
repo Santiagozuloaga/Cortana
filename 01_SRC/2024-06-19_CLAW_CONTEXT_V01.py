@@ -5,7 +5,7 @@ import subprocess
 from pathlib import Path
 from datetime import datetime
 
-from CLAW_2024_06_19_MEMORY_SHIM_V01 import get_memory_context
+from memory_shim import get_memory_context
 
 # Cache for git info and CLAUDE.md to avoid redundant shell calls and FS lookups
 _CONTEXT_CACHE = {

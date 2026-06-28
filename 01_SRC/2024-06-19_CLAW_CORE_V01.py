@@ -1331,8 +1331,7 @@ def cmd_mcp(args: str, _state, _config) -> bool:
     /mcp remove <name> — remove a server from user config
     """
     import importlib; _mod = importlib.import_module('2024-06-19_CLAW_MCP_V01.client'); globals()['get_mcp_manager'] = getattr(_mod, 'get_mcp_manager')
-    from mcp.config import (load_mcp_configs, add_server_to_user_config,
-    import importlib; _mod = importlib.import_module('2024-06-19_CLAW_MCP_V01.tools'); globals()['initialize_mcp'] = getattr(_mod, 'initialize_mcp'); globals()['reload_mcp'] = getattr(_mod, 'reload_mcp'); globals()['refresh_server'] = getattr(_mod, 'refresh_server')
+    import importlib; _mod = importlib.import_module('2024-06-19_CLAW_MCP_V01.config'); globals()['load_mcp_configs'] = getattr(_mod, 'load_mcp_configs'); globals()['add_server_to_user_config'] = getattr(_mod, 'add_server_to_user_config'); globals()['remove_server_from_user_config'] = getattr(_mod, 'remove_server_from_user_config'); globals()['list_config_files'] = getattr(_mod, 'list_config_files')
 
     parts = args.split() if args.strip() else []
     subcmd = parts[0].lower() if parts else ""
@@ -1430,11 +1429,7 @@ def cmd_plugin(args: str, _state, _config) -> bool:
     /plugin recommend [context]  — recommend plugins for context
     /plugin info name            — show plugin details
     """
-    from plugin import (
-        install_plugin, uninstall_plugin, enable_plugin, disable_plugin,
-        disable_all_plugins, update_plugin, list_plugins, get_plugin,
-        PluginScope, recommend_plugins, format_recommendations,
-    )
+    import importlib; _mod = importlib.import_module('2024-06-19_CLAW_PLUGIN_V01'); globals()['install_plugin'] = getattr(_mod, 'install_plugin'); globals()['uninstall_plugin'] = getattr(_mod, 'uninstall_plugin'); globals()['enable_plugin'] = getattr(_mod, 'enable_plugin'); globals()['disable_plugin'] = getattr(_mod, 'disable_plugin'); globals()['disable_all_plugins'] = getattr(_mod, 'disable_all_plugins'); globals()['update_plugin'] = getattr(_mod, 'update_plugin'); globals()['list_plugins'] = getattr(_mod, 'list_plugins'); globals()['get_plugin'] = getattr(_mod, 'get_plugin'); globals()['PluginScope'] = getattr(_mod, 'PluginScope'); globals()['recommend_plugins'] = getattr(_mod, 'recommend_plugins'); globals()['format_recommendations'] = getattr(_mod, 'format_recommendations')
 
     parts = args.split(None, 1)
     subcmd = parts[0].lower() if parts else ""

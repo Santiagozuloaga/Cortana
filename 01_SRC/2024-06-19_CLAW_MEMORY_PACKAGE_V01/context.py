@@ -8,6 +8,7 @@ Provides:
 from __future__ import annotations
 
 from pathlib import Path
+import time as _time
 
 from .store import (
     USER_MEMORY_DIR,
@@ -66,9 +67,12 @@ def truncate_index_content(raw: str) -> str:
     return truncated + warning
 
 
-# ── System prompt context ──────────────────────────────────────────────────
+# ── System prompt context (with TTL cache) ─────────────────────────────────
 
-def get_memory_context(include_guidance: bool = False) -> str:
+_MEMORY_CONTEXT_CACHE = {"data": "", "ts": 0.0, "key": ""}
+_MEMORY_CONTEXT_CACHE_TTL = 3.0  # 3 seconds TTL
+
+def get_memory_context(include_guidance: bool = False, use_cache: bool = True) -> str:
     """Return memory context for injection into the system prompt.
 
     Combines user-level and project-level MEMORY.md content (if present).
@@ -79,6 +83,12 @@ def get_memory_context(include_guidance: bool = False) -> str:
                           (MEMORY_SYSTEM_PROMPT). Normally False since the
                           system prompt template already includes brief guidance.
     """
+    global _MEMORY_CONTEXT_CACHE
+    now = _time.time()
+    cache_key = str(include_guidance)
+    if use_cache and _MEMORY_CONTEXT_CACHE["key"] == cache_key and now - _MEMORY_CONTEXT_CACHE["ts"] < _MEMORY_CONTEXT_CACHE_TTL:
+        return _MEMORY_CONTEXT_CACHE["data"]
+
     parts: list[str] = []
 
     # User-level index
@@ -94,12 +104,17 @@ def get_memory_context(include_guidance: bool = False) -> str:
         parts.append(f"[Project memories]\n{truncated}")
 
     if not parts:
-        return ""
+        res = ""
+    else:
+        body = "\n\n".join(parts)
+        if include_guidance:
+            res = f"{MEMORY_SYSTEM_PROMPT}\n\n## MEMORY.md\n{body}"
+        else:
+            res = body
 
-    body = "\n\n".join(parts)
-    if include_guidance:
-        return f"{MEMORY_SYSTEM_PROMPT}\n\n## MEMORY.md\n{body}"
-    return body
+    if use_cache:
+        _MEMORY_CONTEXT_CACHE = {"data": res, "ts": now, "key": cache_key}
+    return res
 
 
 # ── Relevant memory finder ─────────────────────────────────────────────────

@@ -6,6 +6,7 @@ import uuid
 import queue
 import subprocess
 import tempfile
+import time as _time
 from concurrent.futures import ThreadPoolExecutor, Future
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -91,7 +92,10 @@ _BUILTIN_AGENTS: Dict[str, AgentDefinition] = {
 }
 
 
-# ── Loading agent definitions from .md files ──────────────────────────────
+# ── Loading agent definitions from .md files (with TTL cache) ──────────────
+
+_AGENT_DEFS_CACHE = {"data": None, "ts": 0.0}
+_AGENT_DEFS_CACHE_TTL = 10.0  # 10 seconds TTL
 
 def _parse_agent_md(path: Path, source: str = "user") -> AgentDefinition:
     """Parse a .md file with optional YAML frontmatter into an AgentDefinition.
@@ -154,6 +158,11 @@ def load_agent_definitions() -> Dict[str, AgentDefinition]:
       ~/.clawspring/agents/*.md   (user-level)
       .clawspring/agents/*.md     (project-level, overrides user)
     """
+    global _AGENT_DEFS_CACHE
+    now = _time.time()
+    if _AGENT_DEFS_CACHE["data"] is not None and now - _AGENT_DEFS_CACHE["ts"] < _AGENT_DEFS_CACHE_TTL:
+        return _AGENT_DEFS_CACHE["data"]
+
     defs: Dict[str, AgentDefinition] = dict(_BUILTIN_AGENTS)
 
     # User-level
@@ -176,6 +185,7 @@ def load_agent_definitions() -> Dict[str, AgentDefinition]:
             except Exception:
                 pass
 
+    _AGENT_DEFS_CACHE = {"data": defs, "ts": now}
     return defs
 
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
+import time as _time
 
 
 @dataclass
@@ -123,10 +124,19 @@ def register_builtin_skill(skill: SkillDef) -> None:
     _BUILTIN_SKILLS.append(skill)
 
 
-# ── Load all skills ────────────────────────────────────────────────────────
+# ── Load all skills (with TTL cache) ───────────────────────────────────────
 
-def load_skills(include_builtins: bool = True) -> list[SkillDef]:
+_SKILLS_CACHE = {"data": None, "ts": 0.0, "key": ""}
+_SKILLS_CACHE_TTL = 5.0  # 5 seconds TTL
+
+def load_skills(include_builtins: bool = True, use_cache: bool = True) -> list[SkillDef]:
     """Return skills from disk + builtins, deduplicated (project > user > builtin)."""
+    global _SKILLS_CACHE
+    now = _time.time()
+    cache_key = str(include_builtins)
+    if use_cache and _SKILLS_CACHE["data"] is not None and _SKILLS_CACHE["key"] == cache_key and now - _SKILLS_CACHE["ts"] < _SKILLS_CACHE_TTL:
+        return _SKILLS_CACHE["data"]
+
     seen: dict[str, SkillDef] = {}
 
     # Builtins go in first (lowest priority)
@@ -145,7 +155,10 @@ def load_skills(include_builtins: bool = True) -> list[SkillDef]:
             if skill:
                 seen[skill.name] = skill
 
-    return list(seen.values())
+    res = list(seen.values())
+    if use_cache:
+        _SKILLS_CACHE = {"data": res, "ts": now, "key": cache_key}
+    return res
 
 
 def find_skill(query: str) -> Optional[SkillDef]:
@@ -155,7 +168,8 @@ def find_skill(query: str) -> Optional[SkillDef]:
         return None
 
     first_word = query.split()[0]
-    for skill in load_skills():
+    # Use load_skills without cache for lookup to ensure freshness if called from REPL
+    for skill in load_skills(use_cache=False):
         for trigger in skill.triggers:
             if first_word == trigger:
                 return skill

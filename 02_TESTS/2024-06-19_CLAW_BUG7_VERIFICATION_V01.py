@@ -9,8 +9,7 @@ sys.path.insert(0, str(project_root / "01_SRC"))
 
 def test_thinking_env_with_ttl_cache():
     """Verify that thinking capabilities react to env changes after TTL expires."""
-    import importlib
-    thinking = importlib.import_module("2024-06-19_CLAW_THINKING_V01")
+    import thinking
     modelo_soporta_thinking = thinking.modelo_soporta_thinking
 
     model = "claude-custom-tier"

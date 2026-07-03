@@ -8,8 +8,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.absolute()
 sys.path.insert(0, str(project_root / "01_SRC"))
 
-import importlib
-providers = importlib.import_module("2024-06-19_CLAW_PROVIDERS_V01")
+import providers
 stream = providers.stream
 TextChunk = providers.TextChunk
 AssistantTurn = providers.AssistantTurn

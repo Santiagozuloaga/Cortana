@@ -63,21 +63,18 @@ def save_config(cfg: dict):
 
 
 def current_provider(cfg: dict) -> str:
-    import importlib
-    providers = importlib.import_module("2024-06-19_CLAW_PROVIDERS_V01")
+    import providers
     return providers.detect_provider(cfg.get("model", "claude-opus-4-6"))
 
 
 def has_api_key(cfg: dict) -> bool:
     """Check whether the active provider has an API key configured."""
-    import importlib
-    providers = importlib.import_module("2024-06-19_CLAW_PROVIDERS_V01")
+    import providers
     pname = current_provider(cfg)
     key = providers.get_api_key(pname, cfg)
     return bool(key)
 
 
 def calc_cost(model: str, in_tokens: int, out_tokens: int) -> float:
-    import importlib
-    providers = importlib.import_module("2024-06-19_CLAW_PROVIDERS_V01")
+    import providers
     return providers.calc_cost(model, in_tokens, out_tokens)

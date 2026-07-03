@@ -2,9 +2,6 @@
 import json
 import os
 import re
-import glob as _glob
-import difflib
-import subprocess
 import threading
 from pathlib import Path
 from typing import Callable, Optional
@@ -331,6 +328,7 @@ def _is_safe_bash(cmd: str) -> bool:
 # ── Diff helpers ──────────────────────────────────────────────────────────
 
 def generate_unified_diff(old, new, filename, context_lines=3):
+    import difflib
     old_lines = old.splitlines(keepends=True)
     new_lines = new.splitlines(keepends=True)
     diff = difflib.unified_diff(old_lines, new_lines,
@@ -436,6 +434,7 @@ def _edit(file_path: str, old_string: str, new_string: str, replace_all: bool = 
 
 
 def _bash(command: str, timeout: int = 30) -> str:
+    import subprocess
     try:
         r = subprocess.run(
             command, shell=True, capture_output=True, text=True,
@@ -452,6 +451,7 @@ def _bash(command: str, timeout: int = 30) -> str:
 
 
 def _glob(pattern: str, path: str = None) -> str:
+    import glob as _glob_mod
     base = Path(path) if path else Path.cwd()
     try:
         matches = sorted(base.glob(pattern))
@@ -463,6 +463,7 @@ def _glob(pattern: str, path: str = None) -> str:
 
 
 def _has_rg() -> bool:
+    import subprocess
     try:
         subprocess.run(["rg", "--version"], capture_output=True, check=True)
         return True
@@ -473,6 +474,7 @@ def _has_rg() -> bool:
 def _grep(pattern: str, path: str = None, glob: str = None,
           output_mode: str = "files_with_matches",
           case_insensitive: bool = False, context: int = 0) -> str:
+    import subprocess
     use_rg = _has_rg()
     cmd = ["rg" if use_rg else "grep", "--no-heading"]
     if case_insensitive:
@@ -668,6 +670,7 @@ def _detect_language(file_path: str) -> str:
 
 def _run_quietly(cmd: list[str], cwd: str | None = None, timeout: int = 30) -> tuple[int, str]:
     """Run a command, return (returncode, combined_output)."""
+    import subprocess
     try:
         r = subprocess.run(
             cmd, capture_output=True, text=True, timeout=timeout,
@@ -1043,41 +1046,48 @@ def _register_builtins() -> None:
 
 _register_builtins()
 
+# Global to track if extended tools are already registered
+_extended_tools_registered = False
 
-# ── Memory tools (MemorySave, MemoryDelete, MemorySearch, MemoryList) ────────
-# Defined in memory/tools.py; importing registers them automatically.
-import memory.tools as _memory_tools  # noqa: F401
+def register_extended_tools():
+    """Lazy-register memory, skills, tasks, and MCP tools only when first needed."""
+    global _extended_tools_registered
+    if _extended_tools_registered:
+        return
+    _extended_tools_registered = True
 
+    # ── Memory tools ──
+    import memory.tools as _memory_tools  # noqa: F401
 
+    # ── Multi-agent tools ──
+    import multi_agent.tools as _multiagent_tools  # noqa: F401
 
-# ── Multi-agent tools (Agent, SendMessage, CheckAgentResult, ListAgentTasks, ListAgentTypes) ──
-# Defined in multi_agent/tools.py; importing registers them automatically.
-import multi_agent.tools as _multiagent_tools  # noqa: F401
+    # ── Skill tools ──
+    import skill.tools as _skill_tools  # noqa: F401
 
-# Expose get_agent_manager at module level for backward compatibility
-from multi_agent.tools import get_agent_manager as _get_agent_manager  # noqa: F401
+    # ── MCP tools ──
+    import mcp.tools as _mcp_tools  # noqa: F401
 
+    # ── Plugin tools ──
+    try:
+        from plugin.loader import register_plugin_tools as _reg_plugin_tools
+        _reg_plugin_tools()
+    except Exception:
+        pass
 
-# ── Skill tools (Skill, SkillList) ────────────────────────────────────────
-# Defined in skill/tools.py; importing registers them automatically.
-import skill.tools as _skill_tools  # noqa: F401
+    # ── Task tools ──
+    import task.tools as _task_tools  # noqa: F401
 
+# Override execute_tool to ensure extended tools are registered
+_original_execute_tool = execute_tool
 
-# ── MCP tools ─────────────────────────────────────────────────────────────────
-# mcp/tools.py connects to configured MCP servers and registers their tools.
-# Connection happens in a background thread so startup is not blocked.
-import mcp.tools as _mcp_tools  # noqa: F401
+def execute_tool(name: str, inputs: dict, **kwargs) -> str:
+    # Most built-in tools don't need extended ones, but we play safe
+    # and ensure registry is full before any execution.
+    register_extended_tools()
+    return _original_execute_tool(name, inputs, **kwargs)
 
-
-# ── Plugin tools ───────────────────────────────────────────────────────────────
-# Load tools contributed by installed+enabled plugins.
-try:
-    from plugin.loader import register_plugin_tools as _reg_plugin_tools
-    _reg_plugin_tools()
-except Exception as _plugin_err:
-    pass  # Plugin loading is best-effort; never crash startup
-
-
-# ── Task tools (TaskCreate, TaskUpdate, TaskGet, TaskList) ─────────────────────
-# task/tools.py registers all four tools into the central registry on import.
-import task.tools as _task_tools  # noqa: F401
+# Expose get_agent_manager at module level for backward compatibility (lazy)
+def _get_agent_manager():
+    from multi_agent.tools import get_agent_manager
+    return get_agent_manager()

@@ -125,8 +125,18 @@ def register_builtin_skill(skill: SkillDef) -> None:
 
 # ── Load all skills ────────────────────────────────────────────────────────
 
-def load_skills(include_builtins: bool = True) -> list[SkillDef]:
+import time
+_SKILLS_CACHE: dict[str, any] = {"data": None, "ts": 0}
+SKILLS_TTL = 10.0  # 10 seconds default TTL
+
+def load_skills(include_builtins: bool = True, ignore_cache: bool = False) -> list[SkillDef]:
     """Return skills from disk + builtins, deduplicated (project > user > builtin)."""
+
+    # Check cache first
+    now = time.time()
+    if not ignore_cache and _SKILLS_CACHE["data"] is not None and (now - _SKILLS_CACHE["ts"]) < SKILLS_TTL:
+        return list(_SKILLS_CACHE["data"])
+
     seen: dict[str, SkillDef] = {}
 
     # Builtins go in first (lowest priority)
@@ -145,7 +155,10 @@ def load_skills(include_builtins: bool = True) -> list[SkillDef]:
             if skill:
                 seen[skill.name] = skill
 
-    return list(seen.values())
+    res = list(seen.values())
+    _SKILLS_CACHE["data"] = res
+    _SKILLS_CACHE["ts"] = now
+    return res
 
 
 def find_skill(query: str) -> Optional[SkillDef]:

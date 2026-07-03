@@ -132,7 +132,7 @@ def test_parse_skill_file_allowed_tools(tmp_path):
 # ------------------------------------------------------------------
 
 def test_load_skills(skill_dir):
-    skills = load_skills()
+    skills = load_skills(ignore_cache=True)
     assert len(skills) == 2
     names = {s.name for s in skills}
     assert names == {"commit", "review"}
@@ -143,19 +143,19 @@ def test_load_skills_empty_dir(tmp_path, monkeypatch):
     empty.mkdir()
     monkeypatch.setattr(_loader, "_get_skill_paths", lambda: [empty])
     monkeypatch.setattr(_loader, "_BUILTIN_SKILLS", [])
-    assert load_skills() == []
+    assert load_skills(ignore_cache=True) == []
 
 
 def test_load_skills_nonexistent_dir(tmp_path, monkeypatch):
     monkeypatch.setattr(_loader, "_get_skill_paths", lambda: [tmp_path / "does_not_exist"])
     monkeypatch.setattr(_loader, "_BUILTIN_SKILLS", [])
-    assert load_skills() == []
+    assert load_skills(ignore_cache=True) == []
 
 
 def test_load_skills_builtins_present(monkeypatch):
     """Without patching, builtins (commit, review) should be present."""
     monkeypatch.setattr(_loader, "_get_skill_paths", lambda: [])
-    skills = load_skills()
+    skills = load_skills(ignore_cache=True)
     names = {s.name for s in skills}
     assert "commit" in names
     assert "review" in names
@@ -170,7 +170,7 @@ def test_load_skills_project_overrides_builtin(tmp_path, monkeypatch):
         "---\nname: commit\ndescription: OVERRIDDEN\n---\ncustom commit prompt\n"
     )
     monkeypatch.setattr(_loader, "_get_skill_paths", lambda: [skills_dir])
-    skills = load_skills()
+    skills = load_skills(ignore_cache=True)
     commit = next(s for s in skills if s.name == "commit")
     assert commit.description == "OVERRIDDEN"
 

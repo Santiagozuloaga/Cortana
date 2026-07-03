@@ -562,16 +562,20 @@ USER FOCUS: {user_topic}
         personas = dict(list(_TECH_PERSONAS.items())[:agent_count])
     
     # ── Identity Generator ────────────────────────────────────────────────
+    _fake_factory = None
+    try:
+        from faker import Faker
+        _fake_factory = Faker()
+    except ImportError:
+        pass
+
     def get_identity(letter):
-        try:
-            from faker import Faker
-            fake = Faker()
-            return f"{letter}", fake.name()
-        except ImportError:
-            # Corrección Bug #1: except específico, no except: desnudo
-            first = ["Alex", "Sam", "Taylor", "Jordan", "Casey", "Riley", "Drew", "Avery"]
-            last = ["Garcia", "Martinez", "Lopez", "Hernandez", "Gonzalez", "Sanchez", "Ramirez", "Torres"]
-            return f"{letter}", f"{random.choice(first)} {random.choice(last)}"
+        if _fake_factory:
+            return f"{letter}", _fake_factory.name()
+        # Corrección Bug #1: except específico, no except: desnudo
+        first = ["Alex", "Sam", "Taylor", "Jordan", "Casey", "Riley", "Drew", "Avery"]
+        last = ["Garcia", "Martinez", "Lopez", "Hernandez", "Gonzalez", "Sanchez", "Ramirez", "Torres"]
+        return f"{letter}", f"{random.choice(first)} {random.choice(last)}"
             
     # ── Debate Loop ───────────────────────────────────────────────────────
     outputs_dir = Path("brainstorm_outputs")
@@ -2742,7 +2746,10 @@ def repl(config: dict, initial_prompt: str = None):
         t.start()
     
     def run_query(user_input: str, is_background: bool = False):
-        sage_check_cooling()
+        try:
+            sage_check_cooling()
+        except NameError:
+            pass
         nonlocal verbose
         
         with query_lock:

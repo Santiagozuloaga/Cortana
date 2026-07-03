@@ -175,12 +175,18 @@ def get_claude_md() -> str:
     return res
 
 
+_PLATFORM_CACHE = None
+
 def build_system_prompt() -> str:
-    import platform
+    global _PLATFORM_CACHE
+    if _PLATFORM_CACHE is None:
+        import platform
+        _PLATFORM_CACHE = platform.system()
+
     prompt = SYSTEM_PROMPT_TEMPLATE.format(
         date=datetime.now().strftime("%Y-%m-%d %A"),
         cwd=str(Path.cwd()),
-        platform=platform.system(),
+        platform=_PLATFORM_CACHE,
         git_info=get_git_info(),
         claude_md=get_claude_md(),
     )

@@ -48,7 +48,7 @@ from typing import Optional
 # ── Módulos de correcciones (del otro Claude) ──────────────────────────────
 from encoding   import configure_encoding, safe_print
 from thinking   import construir_params_thinking, modelo_soporta_thinking
-from memory     import guardar_memoria_auto, cargar_sesion, listar_sesiones
+from memory_shim_python import guardar_memoria_auto, cargar_sesion, listar_sesiones
 from error_utils import tarea_segura, TareaConCancelacion
 
 # ── Personalidad de Claw ───────────────────────────────────────────────────

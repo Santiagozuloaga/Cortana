@@ -1,1 +1,9 @@
-00_SOPORTE/2024-06-19_CLAW_GITIGNORE_V01.txt
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+debug_payload.json
+brainstorm_outputs/
+00_SOPORTE/local_config.json
+.pytest_cache/

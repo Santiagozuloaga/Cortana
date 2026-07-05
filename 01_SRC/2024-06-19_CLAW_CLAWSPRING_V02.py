@@ -1297,16 +1297,21 @@ def cmd_agents(_args: str, _state, _config) -> bool:
     return True
 
 
+_agent_manager_cache = None
+
 def _print_background_notifications():
     """Print notifications for newly completed background agent tasks.
 
     Called before each user prompt so the user sees results without polling.
     """
-    try:
-        from multi_agent.tools import get_agent_manager
-        mgr = get_agent_manager()
-    except Exception:
-        return
+    global _agent_manager_cache
+    if _agent_manager_cache is None:
+        try:
+            from multi_agent.tools import get_agent_manager
+            _agent_manager_cache = get_agent_manager()
+        except Exception:
+            return
+    mgr = _agent_manager_cache
 
     notified_key = "_notified"
     if not hasattr(_print_background_notifications, "_seen"):

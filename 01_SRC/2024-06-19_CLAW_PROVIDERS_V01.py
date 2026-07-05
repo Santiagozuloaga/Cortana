@@ -23,10 +23,26 @@ from __future__ import annotations
 import json
 import logging
 import os
+import time
 import urllib.request
 from typing import Generator
 
 logger = logging.getLogger(__name__)
+
+# ── Environment cache (Bug #7 fix) ─────────────────────────────────────────
+_ENV_CACHE = {}
+_ENV_CACHE_TTL = 5.0  # 5 seconds TTL
+
+def _get_cached_env(key: str, default: str = "") -> str:
+    """Get environment variable with a short-lived TTL cache."""
+    now = time.time()
+    if key in _ENV_CACHE:
+        val, ts = _ENV_CACHE[key]
+        if now - ts < _ENV_CACHE_TTL:
+            return val
+    val = os.environ.get(key, default)
+    _ENV_CACHE[key] = (val, now)
+    return val
 
 # ── Provider registry ──────────────────────────────────────────────────────
 
@@ -197,8 +213,7 @@ def get_api_key(provider_name: str, config: dict) -> str:
     # 2. Check env var
     env_var = prov.get("api_key_env")
     if env_var:
-        import os
-        return os.environ.get(env_var, "")
+        return _get_cached_env(env_var)
     # 3. Hardcoded (for local providers)
     return prov.get("api_key", "")
 
@@ -360,7 +375,7 @@ def _model_supports_thinking(model: str) -> bool:
     Corrección Bug #3: Verifica si el modelo soporta extended thinking.
     Solo modelos Anthropic Claude específicos lo soportan.
     Qwen3, Llama, DeepSeek, etc. causan error 400 si reciben el parámetro.
-    Corrección Bug #7: No usa cache — lee env en cada llamada.
+    Corrección Bug #7: Implementado cache TTL para evitar lecturas de env redundantes.
     """
     model_lower = model.lower()
 
@@ -370,8 +385,8 @@ def _model_supports_thinking(model: str) -> bool:
         ("ANTHROPIC_DEFAULT_SONNET_MODEL", "ANTHROPIC_DEFAULT_SONNET_MODEL_SUPPORTED_CAPABILITIES"),
         ("ANTHROPIC_DEFAULT_HAIKU_MODEL",  "ANTHROPIC_DEFAULT_HAIKU_MODEL_SUPPORTED_CAPABILITIES"),
     ]:
-        tier_model = os.environ.get(tier_model_env, "").lower()
-        tier_caps  = os.environ.get(tier_caps_env, "")
+        tier_model = _get_cached_env(tier_model_env).lower()
+        tier_caps  = _get_cached_env(tier_caps_env)
         if tier_model and tier_caps and model_lower == tier_model:
             return "thinking" in {c.strip().lower() for c in tier_caps.split(",")}
 
@@ -707,10 +722,9 @@ def stream(
         base_url = prov.get("base_url", "http://localhost:11434")
         yield from stream_ollama(base_url, model_name, system, messages, tool_schemas, config)
     else:
-        import os as _os
         if provider_name == "custom":
             base_url = (config.get("custom_base_url")
-                        or _os.environ.get("CUSTOM_BASE_URL", ""))
+                        or _get_cached_env("CUSTOM_BASE_URL"))
             if not base_url:
                 raise ValueError(
                     "custom provider requires a base_url. "

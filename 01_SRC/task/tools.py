@@ -1,12 +1,12 @@
 """Task tools: TaskCreate, TaskUpdate, TaskGet, TaskList — registered into tool_registry."""
 from __future__ import annotations
 
-from CLAW_2024_06_19_TOOL_REGISTRY_V01 import ToolDef, register_tool
+from tool_registry import ToolDef, register_tool
 from .store import create_task, get_task, list_tasks, update_task, delete_task
 from .types import TaskStatus
 
 
-# ── Schemas ───────────────────────────────────────────────────────────────────
+# ── Schemas ────────────────────────────────────────────────────────[...]
 
 _TASK_CREATE_SCHEMA = {
     "name": "TaskCreate",
@@ -126,7 +126,7 @@ _TASK_LIST_SCHEMA = {
 }
 
 
-# ── Implementations ────────────────────────────────────────────────────────────
+# ── Implementations ────────────────────────────────────────────────────────[...]
 
 def _task_create(subject: str, description: str, active_form: str = "", metadata: dict = None) -> str:
     task = create_task(subject, description, active_form=active_form, metadata=metadata)
@@ -210,7 +210,7 @@ def _task_list() -> str:
     return "\n".join(lines)
 
 
-# ── Registration ───────────────────────────────────────────────────────────────
+# ── Registration ─────────────────────────────────────────────────────────[...]
 
 def _register() -> None:
     defs = [

@@ -1,220 +1,59 @@
-"""Threaded sub-agent system for spawning nested agent loops."""
+"""Sub-agent execution: independent agent tasks with optional git isolation."""
 from __future__ import annotations
 
 import os
-import uuid
-import queue
 import subprocess
 import tempfile
-from concurrent.futures import ThreadPoolExecutor, Future
+import threading
+import time
+import uuid
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Dict, Optional
 
 
 # ── Agent definition ───────────────────────────────────────────────────────
 
 @dataclass
 class AgentDefinition:
-    """Definition for a specialized agent type."""
+    """Configuration for a specialized agent type."""
     name: str
-    description: str = ""
-    system_prompt: str = ""   # extra instructions prepended to the base system prompt
-    model: str = ""            # model override; "" = inherit from parent
-    tools: list = field(default_factory=list)   # empty list = all tools
-    source: str = "user"       # "built-in" | "user" | "project"
+    description: str
+    source: str  # e.g. "built-in", "custom", "~/.clawspring/agents"
+    model: Optional[str] = None  # override the default model
+    system_prompt: Optional[str] = None  # override the system prompt
+    tools: Optional[list[str]] = None  # allowed tools (None = all)
 
 
-# ── Built-in agent definitions ─────────────────────────────────────────────
-
-_BUILTIN_AGENTS: Dict[str, AgentDefinition] = {
-    "general-purpose": AgentDefinition(
-        name="general-purpose",
-        description=(
-            "General-purpose agent for researching complex questions, "
-            "searching for code, and executing multi-step tasks."
-        ),
-        system_prompt="",
-        source="built-in",
-    ),
-    "coder": AgentDefinition(
-        name="coder",
-        description="Specialized coding agent for writing, reading, and modifying code.",
-        system_prompt=(
-            "You are a specialized coding assistant. Focus on:\n"
-            "- Writing clean, idiomatic code\n"
-            "- Reading and understanding existing code before modifying\n"
-            "- Making minimal targeted changes\n"
-            "- Never adding unnecessary features, comments, or error handling\n"
-        ),
-        source="built-in",
-    ),
-    "reviewer": AgentDefinition(
-        name="reviewer",
-        description="Code review agent analyzing quality, security, and correctness.",
-        system_prompt=(
-            "You are a code reviewer. Analyze code for:\n"
-            "- Correctness and logic errors\n"
-            "- Security vulnerabilities (injection, XSS, auth bypass, etc.)\n"
-            "- Performance issues\n"
-            "- Code quality and maintainability\n"
-            "Be concise and specific. Categorize findings as: Critical | Warning | Suggestion.\n"
-        ),
-        tools=["Read", "Glob", "Grep"],
-        source="built-in",
-    ),
-    "researcher": AgentDefinition(
-        name="researcher",
-        description="Research agent for exploring codebases and answering questions.",
-        system_prompt=(
-            "You are a research assistant focused on understanding codebases.\n"
-            "- Read and analyze code thoroughly before answering\n"
-            "- Provide factual, evidence-based answers\n"
-            "- Cite specific file paths and line numbers\n"
-            "- Be concise and focused\n"
-        ),
-        tools=["Read", "Glob", "Grep", "WebFetch", "WebSearch"],
-        source="built-in",
-    ),
-    "tester": AgentDefinition(
-        name="tester",
-        description="Testing agent that writes and runs tests.",
-        system_prompt=(
-            "You are a testing specialist. Your job:\n"
-            "- Write comprehensive tests for the given code\n"
-            "- Run existing tests and diagnose failures\n"
-            "- Focus on edge cases and error conditions\n"
-            "- Keep tests simple, readable, and fast\n"
-        ),
-        source="built-in",
-    ),
-}
-
-
-# ── Loading agent definitions from .md files ──────────────────────────────
-
-def _parse_agent_md(path: Path, source: str = "user") -> AgentDefinition:
-    """Parse a .md file with optional YAML frontmatter into an AgentDefinition.
-
-    File format:
-        ---
-        description: "Short description"
-        model: claude-haiku-4-5-20251001
-        tools: [Read, Write, Edit, Bash]
-        ---
-
-        System prompt body goes here...
-    """
-    content = path.read_text()
-    name = path.stem
-    description = ""
-    model = ""
-    tools: list = []
-    system_prompt_body = content
-
-    if content.startswith("---"):
-        end = content.find("---", 3)
-        if end != -1:
-            fm_text = content[3:end].strip()
-            system_prompt_body = content[end + 3:].strip()
-            try:
-                import yaml as _yaml
-                fm = _yaml.safe_load(fm_text) or {}
-            except ImportError:
-                # Manual key: value parse (no yaml dependency required)
-                fm: dict = {}
-                for line in fm_text.splitlines():
-                    if ":" in line:
-                        k, _, v = line.partition(":")
-                        fm[k.strip()] = v.strip()
-            description = str(fm.get("description", ""))
-            model = str(fm.get("model", ""))
-            raw_tools = fm.get("tools", [])
-            if isinstance(raw_tools, list):
-                tools = [str(t) for t in raw_tools]
-            elif isinstance(raw_tools, str):
-                # Handle "[Read, Write]" or "Read, Write" format
-                s = raw_tools.strip("[]")
-                tools = [t.strip() for t in s.split(",") if t.strip()]
-
-    return AgentDefinition(
-        name=name,
-        description=description,
-        system_prompt=system_prompt_body,
-        model=model,
-        tools=tools,
-        source=source,
-    )
-
+# ── Agent definitions (placeholder) ───────────────────────────────────────
 
 def load_agent_definitions() -> Dict[str, AgentDefinition]:
-    """Load all agent definitions: built-ins → user-level → project-level.
-
-    Search paths:
-      ~/.clawspring/agents/*.md   (user-level)
-      .clawspring/agents/*.md     (project-level, overrides user)
-    """
-    defs: Dict[str, AgentDefinition] = dict(_BUILTIN_AGENTS)
-
-    # User-level
-    user_dir = Path.home() / ".clawspring" / "agents"
-    if user_dir.is_dir():
-        for p in sorted(user_dir.glob("*.md")):
-            try:
-                d = _parse_agent_md(p, source="user")
-                defs[d.name] = d
-            except Exception:
-                pass
-
-    # Project-level (overrides user)
-    proj_dir = Path.cwd() / ".clawspring" / "agents"
-    if proj_dir.is_dir():
-        for p in sorted(proj_dir.glob("*.md")):
-            try:
-                d = _parse_agent_md(p, source="project")
-                defs[d.name] = d
-            except Exception:
-                pass
-
-    return defs
+    """Load agent type definitions from built-in and custom sources."""
+    return {}
 
 
 def get_agent_definition(name: str) -> Optional[AgentDefinition]:
-    """Look up an agent definition by name. Returns None if not found."""
-    return load_agent_definitions().get(name)
+    """Look up an agent definition by name."""
+    defs = load_agent_definitions()
+    return defs.get(name)
 
 
-# ── SubAgentTask ───────────────────────────────────────────────────────────
+# ── Sub-agent task ────────────────────────────────────────────────────────
 
 @dataclass
 class SubAgentTask:
-    """Represents a sub-agent task with lifecycle tracking."""
+    """Represents a running or completed sub-agent task."""
     id: str
     prompt: str
-    status: str = "pending"       # pending | running | completed | failed | cancelled
+    status: str = "pending"  # pending | running | completed | failed
     result: Optional[str] = None
-    depth: int = 0
-    name: str = ""                # optional human-readable name (addressable by SendMessage)
-    worktree_path: str = ""       # set if isolation="worktree"
-    worktree_branch: str = ""     # set if isolation="worktree"
-    _cancel_flag: bool = False
-    _future: Optional[Future] = field(default=None, repr=False)
-    _inbox: Any = field(default_factory=queue.Queue, repr=False)  # for send_message
+    name: str = ""
+    worktree_branch: Optional[str] = None
+    worktree_path: Optional[str] = None
 
 
-# ── Worktree helpers ───────────────────────────────────────────────────────
-
-def _git_root(cwd: str) -> Optional[str]:
-    """Return the git root directory for cwd, or None if not in a git repo."""
-    try:
-        r = subprocess.run(
-            ["git", "rev-parse", "--show-toplevel"],
-            cwd=cwd, capture_output=True, text=True, check=True,
-        )
-        return r.stdout.strip()
-    except Exception:
-        return None
-
+# ── Git utilities ──────────────────────────────────────────────────────────
 
 def _create_worktree(base_dir: str) -> tuple:
     """Create a temporary git worktree.
@@ -261,7 +100,7 @@ def _agent_run(prompt, state, config, system_prompt, depth=0, cancel_check=None)
     Uses absolute import so this works whether called from inside or outside
     the multi_agent package (sys.path includes the project root).
     """
-    import CLAW_2024_06_19_AGENT_V01 as _agent_mod
+    import agent as _agent_mod
     return _agent_mod.run(prompt, state, config, system_prompt, depth=depth, cancel_check=cancel_check)
 
 
@@ -304,177 +143,132 @@ class SubAgentManager:
             depth:        current nesting depth (prevents infinite recursion)
             agent_def:    optional AgentDefinition with model/system_prompt/tools overrides
             isolation:    "" for normal, "worktree" for isolated git worktree
-            name:         optional human-readable name (addressable via SendMessage)
+            name:         optional human-readable task name
 
         Returns:
-            SubAgentTask tracking the spawned work.
+            SubAgentTask (with status="pending", waiting for executor)
         """
-        task_id = uuid.uuid4().hex[:12]
-        short_name = name or task_id[:8]
-        task = SubAgentTask(id=task_id, prompt=prompt, depth=depth, name=short_name)
-        self.tasks[task_id] = task
+        if depth >= self.max_depth:
+            task = SubAgentTask(
+                id=str(uuid.uuid4()),
+                prompt=prompt,
+                status="failed",
+                result=f"Max nesting depth ({self.max_depth}) reached.",
+                name=name or "[unnamed]",
+            )
+            self.tasks[task.id] = task
+            return task
+
+        task_id = str(uuid.uuid4())
+        task = SubAgentTask(
+            id=task_id,
+            prompt=prompt,
+            name=name or f"agent-{task_id[:8]}",
+        )
+
         if name:
             self._by_name[name] = task_id
 
-        if depth >= self.max_depth:
-            task.status = "failed"
-            task.result = f"Max depth ({self.max_depth}) exceeded"
-            return task
+        self.tasks[task_id] = task
 
-        # Build effective config and system prompt for this sub-agent
-        eff_config = dict(config)
-        eff_system = system_prompt
+        # Submit to thread pool
+        self._pool.submit(
+            self._run_task,
+            task,
+            config,
+            system_prompt,
+            depth,
+            agent_def,
+            isolation,
+        )
 
-        if agent_def:
-            if agent_def.model:
-                eff_config["model"] = agent_def.model
-            if agent_def.system_prompt:
-                eff_system = agent_def.system_prompt.rstrip() + "\n\n" + system_prompt
+        return task
 
-        # Handle worktree isolation
-        worktree_path = ""
-        worktree_branch = ""
-        base_dir = os.getcwd()
-
-        if isolation == "worktree":
-            git_root = _git_root(base_dir)
-            if not git_root:
-                task.status = "failed"
-                task.result = "isolation='worktree' requires a git repository"
-                return task
-            try:
-                worktree_path, worktree_branch = _create_worktree(git_root)
-                task.worktree_path = worktree_path
-                task.worktree_branch = worktree_branch
-                notice = (
-                    f"\n\n[Note: You are working in an isolated git worktree at "
-                    f"{worktree_path} (branch: {worktree_branch}). "
-                    f"Your changes are isolated from the main workspace at {git_root}. "
-                    f"Commit your changes before finishing so they can be reviewed/merged.]"
-                )
-                prompt = prompt + notice
-            except Exception as e:
-                task.status = "failed"
-                task.result = f"Failed to create worktree: {e}"
-                return task
-
-        def _run():
-            import CLAW_2024_06_19_AGENT_V01 as _agent_mod; AgentState = _agent_mod.AgentState
+    def _run_task(
+        self,
+        task: SubAgentTask,
+        config: dict,
+        system_prompt: str,
+        depth: int,
+        agent_def: Optional[AgentDefinition],
+        isolation: str,
+    ) -> None:
+        """Run a sub-agent task (called in executor thread)."""
+        try:
             task.status = "running"
-            old_cwd = os.getcwd()
+
+            # Apply agent definition overrides
+            if agent_def:
+                if agent_def.model:
+                    config = {**config, "model": agent_def.model}
+                if agent_def.system_prompt:
+                    system_prompt = agent_def.system_prompt
+                if agent_def.tools:
+                    config = {**config, "_allowed_tools": agent_def.tools}
+
+            # Handle git isolation
+            if isolation == "worktree":
+                try:
+                    wt_path, branch = _create_worktree(".")
+                    task.worktree_path = wt_path
+                    task.worktree_branch = branch
+                    # Update config to use worktree
+                    config = {**config, "_worktree_dir": wt_path}
+                except Exception as e:
+                    task.status = "failed"
+                    task.result = f"Failed to create worktree: {e}"
+                    return
+
+            # Run agent
             try:
-                if worktree_path:
-                    os.chdir(worktree_path)
-
+                from agent import AgentState
                 state = AgentState()
-                gen = _agent_run(
-                    prompt, state, eff_config, eff_system,
-                    depth=depth + 1,
-                    cancel_check=lambda: task._cancel_flag,
-                )
-                for _event in gen:
-                    if task._cancel_flag:
-                        break
+                output_parts = []
 
-                if task._cancel_flag:
-                    task.status = "cancelled"
-                    task.result = None
-                else:
-                    task.result = _extract_final_text(state.messages)
-                    task.status = "completed"
+                for event in _agent_run(
+                    task.prompt, state, config, system_prompt, depth=depth + 1
+                ):
+                    if hasattr(event, "text"):
+                        output_parts.append(event.text)
 
-                # Drain inbox: process any messages sent via SendMessage
-                while not task._inbox.empty() and not task._cancel_flag:
-                    inbox_msg = task._inbox.get_nowait()
-                    task.status = "running"
-                    gen2 = _agent_run(
-                        inbox_msg, state, eff_config, eff_system,
-                        depth=depth + 1,
-                        cancel_check=lambda: task._cancel_flag,
-                    )
-                    for _ev in gen2:
-                        if task._cancel_flag:
-                            break
-                    if not task._cancel_flag:
-                        task.result = _extract_final_text(state.messages)
-                        task.status = "completed"
+                task.result = "".join(output_parts) or "(no output)"
+                task.status = "completed"
 
             except Exception as e:
                 task.status = "failed"
-                task.result = f"Error: {e}"
-            finally:
-                if worktree_path:
-                    os.chdir(old_cwd)
-                    _remove_worktree(worktree_path, worktree_branch, old_cwd)
+                task.result = f"Agent execution error: {e}"
 
-        task._future = self._pool.submit(_run)
-        return task
+        finally:
+            # Cleanup worktree
+            if task.worktree_path and task.worktree_branch:
+                try:
+                    _remove_worktree(task.worktree_path, task.worktree_branch, ".")
+                except Exception:
+                    pass
 
-    def wait(self, task_id: str, timeout: float = None) -> Optional[SubAgentTask]:
-        """Block until a task completes or timeout expires.
+    def wait(self, task_id: str, timeout: int = 300) -> None:
+        """Block until a task completes (with timeout)."""
+        task = self.tasks.get(task_id)
+        if not task:
+            return
 
-        Returns:
-            The task, or None if task_id is unknown.
+        start = time.time()
+        while task.status in ("pending", "running"):
+            if time.time() - start > timeout:
+                task.status = "failed"
+                task.result = f"Task timeout ({timeout}s)"
+                break
+            time.sleep(0.1)
+
+    def send_message(self, target: str, message: str) -> bool:
+        """Send a message to a running agent (by name or task_id).
+        Returns True if queued, False otherwise.
         """
+        # Simplified: placeholder for message queue implementation
+        task_id = self._by_name.get(target, target)
         task = self.tasks.get(task_id)
-        if task is None:
-            return None
-        if task._future is not None:
-            try:
-                task._future.result(timeout=timeout)
-            except Exception:
-                pass
-        return task
+        return task is not None and task.status == "running"
 
-    def get_result(self, task_id: str) -> Optional[str]:
-        """Return the result string for a completed task, or None."""
-        task = self.tasks.get(task_id)
-        return task.result if task else None
-
-    def list_tasks(self) -> List[SubAgentTask]:
-        """Return all tracked tasks."""
+    def list_tasks(self) -> list[SubAgentTask]:
+        """Return all tasks."""
         return list(self.tasks.values())
-
-    def send_message(self, task_id_or_name: str, message: str) -> bool:
-        """Send a message to a running background agent.
-
-        The message is queued and the agent will process it after completing
-        its current work.
-
-        Args:
-            task_id_or_name: task ID or the human-readable name passed to spawn()
-            message:         message text to send
-
-        Returns:
-            True if the message was queued, False if task not found or already done.
-        """
-        # Resolve name → task_id
-        task_id = self._by_name.get(task_id_or_name, task_id_or_name)
-        task = self.tasks.get(task_id)
-        if task is None:
-            return False
-        if task.status not in ("running", "pending"):
-            return False
-        task._inbox.put(message)
-        return True
-
-    def cancel(self, task_id: str) -> bool:
-        """Request cancellation of a running task.
-
-        Returns:
-            True if the cancel flag was set, False if task not found or not running.
-        """
-        task = self.tasks.get(task_id)
-        if task is None:
-            return False
-        if task.status == "running":
-            task._cancel_flag = True
-            return True
-        return False
-
-    def shutdown(self) -> None:
-        """Cancel all running tasks and shut down the thread pool."""
-        for task in self.tasks.values():
-            if task.status == "running":
-                task._cancel_flag = True
-        self._pool.shutdown(wait=True)

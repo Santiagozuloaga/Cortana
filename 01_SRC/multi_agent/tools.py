@@ -9,7 +9,7 @@ Registers the following tools into the central tool_registry:
 """
 from __future__ import annotations
 
-from CLAW_2024_06_19_TOOL_REGISTRY_V01 import ToolDef, register_tool
+from tool_registry import ToolDef, register_tool
 from .subagent import SubAgentManager, get_agent_definition, load_agent_definitions
 
 
@@ -127,7 +127,7 @@ def _list_agent_tasks(params: dict, config: dict) -> str:
     if not tasks:
         return "No sub-agent tasks."
     lines = ["ID           | Name     | Status    | Worktree branch | Prompt"]
-    lines.append("-------------|----------|-----------|-----------------|------")
+    lines.append("-----------")
     for t in tasks:
         prompt_short = t.prompt[:50] + ("..." if len(t.prompt) > 50 else "")
         wt = t.worktree_branch[:15] if t.worktree_branch else "-"

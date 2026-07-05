@@ -1,7 +1,7 @@
 """Skill tool: lets the model invoke skills by name via tool call."""
 from __future__ import annotations
 
-from CLAW_2024_06_19_TOOL_REGISTRY_V01 import ToolDef, register_tool
+from tool_registry import ToolDef, register_tool
 from .loader import find_skill, load_skills, substitute_arguments
 
 
@@ -60,7 +60,7 @@ def _skill_tool(params: dict, config: dict) -> str:
     message = f"[Skill: {skill.name}]\n\n{rendered}"
 
     # Run inline via agent and collect text output
-    import CLAW_2024_06_19_AGENT_V01 as _agent
+    import agent as _agent
     system_prompt = config.get("_system_prompt", "")
 
     # Collect output text

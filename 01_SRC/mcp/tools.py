@@ -16,20 +16,20 @@ from __future__ import annotations
 import threading
 from typing import Dict, List, Optional
 
-from CLAW_2024_06_19_TOOL_REGISTRY_V01 import ToolDef, register_tool
+from tool_registry import ToolDef, register_tool
 from .client import MCPClient, MCPManager, get_mcp_manager
 from .config import load_mcp_configs
 from .types import MCPServerConfig, MCPTool
 
 
-# ── Global state ──────────────────────────────────────────────────────────────
+# ── Global state ──────────────────────────────────────────────────────────[...]
 
 _initialized = False
 _init_lock = threading.Lock()
 _connect_errors: Dict[str, Optional[str]] = {}   # server → error or None
 
 
-# ── Tool wrapper ──────────────────────────────────────────────────────────────
+# ── Tool wrapper ──────────────────────────────────────────────────────────[...]
 
 def _make_mcp_func(qualified_name: str):
     """Return a tool func that calls the MCP server for a given qualified name."""
@@ -53,7 +53,7 @@ def _register_tool(tool: MCPTool) -> None:
     register_tool(td)
 
 
-# ── Initialization ────────────────────────────────────────────────────────────
+# ── Initialization ─────────────────────────────────────────────────────────[...]
 
 def initialize_mcp(verbose: bool = False) -> Dict[str, Optional[str]]:
     """Load configs, connect servers, register tools. Idempotent.

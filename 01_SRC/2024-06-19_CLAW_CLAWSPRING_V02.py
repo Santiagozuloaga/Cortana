@@ -92,19 +92,32 @@ from pathlib import Path
 from datetime import datetime
 from typing import Optional, Union
 import threading
-# ── Optional rich for markdown rendering ──────────────────────────────────
-try:
-    from rich.console import Console
-    from rich.markdown import Markdown
-    from rich.live import Live
-    from rich.syntax import Syntax
-    from rich.panel import Panel
-    from rich import print as rprint
-    _RICH = True
-    console = Console()
-except ImportError:
-    _RICH = False
-    console = None
+# ── Optional rich for markdown rendering (lazy loaded) ─────────────────────
+_RICH = None
+console = None
+Console = None
+Markdown = None
+Live = None
+Syntax = None
+Panel = None
+rprint = None
+
+def _init_rich():
+    global _RICH, console, Console, Markdown, Live, Syntax, Panel, rprint
+    if _RICH is None:
+        try:
+            from rich.console import Console as _Console
+            from rich.markdown import Markdown as _Markdown
+            from rich.live import Live as _Live
+            from rich.syntax import Syntax as _Syntax
+            from rich.panel import Panel as _Panel
+            from rich import print as _rprint
+            Console, Markdown, Live, Syntax, Panel, rprint = _Console, _Markdown, _Live, _Syntax, _Panel, _rprint
+            _RICH = True
+            console = Console()
+        except ImportError:
+            _RICH = False
+    return _RICH
 VERSION = "3.05.5"
 
 # ── ANSI helpers (used even with rich for non-markdown output) ─────────────
@@ -159,14 +172,14 @@ _RICH_LIVE = True  # set to False (via config rich_live=false) to disable in-pla
 
 def _make_renderable(text: str):
     """Return a Rich renderable: Markdown if text contains markup, else plain."""
-    if any(c in text for c in ("#", "*", "`", "_", "[")):
+    if _init_rich() and any(c in text for c in ("#", "*", "`", "_", "[")):
         return Markdown(text)
     return text
 
 def _start_live() -> None:
     """Start a Rich Live block for in-place Markdown streaming (no-op if not Rich)."""
     global _current_live
-    if _RICH and _RICH_LIVE and _current_live is None:
+    if _init_rich() and _RICH_LIVE and _current_live is None:
         _current_live = Live(console=console, auto_refresh=False,
                              vertical_overflow="visible")
         _current_live.start()
@@ -175,7 +188,7 @@ def stream_text(chunk: str) -> None:
     """Buffer chunk; update Live in-place when Rich available, else print directly."""
     global _current_live
     _accumulated_text.append(chunk)
-    if _RICH and _RICH_LIVE:
+    if _init_rich() and _RICH_LIVE:
         if _current_live is None:
             _start_live()
         # Only update if chunk contains potentially formatting-changing characters
@@ -204,7 +217,7 @@ def flush_response() -> None:
     if _current_live is not None:
         _current_live.stop()
         _current_live = None
-    elif _RICH and _RICH_LIVE and full.strip():
+    elif _init_rich() and _RICH_LIVE and full.strip():
         # Fallback: no Live was running but Rich is available (e.g. after thinking)
         console.print(_make_renderable(full))
     else:
@@ -2736,10 +2749,10 @@ def repl(config: dict, initial_prompt: str = None):
     # Auto-detect SSH sessions and dumb terminals where ANSI cursor-up doesn't work.
     import os as _os
     _in_ssh = bool(_os.environ.get("SSH_CLIENT") or _os.environ.get("SSH_TTY"))
-    _is_dumb = (console is not None and getattr(console, "is_dumb_terminal", False))
+    _is_dumb = (_init_rich() and getattr(console, "is_dumb_terminal", False))
     _rich_live_default = not _in_ssh and not _is_dumb
     global _RICH_LIVE
-    _RICH_LIVE = _RICH and config.get("rich_live", _rich_live_default)
+    _RICH_LIVE = _init_rich() and config.get("rich_live", _rich_live_default)
 
     # Initialize proactive polling state in config (avoids module-level globals)
     config.setdefault("_proactive_enabled", False)

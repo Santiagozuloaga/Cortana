@@ -4,15 +4,15 @@
 * **SAFE:** Imports de librerías estándar (os, sys, json, etc.).
 * **BROKEN:**
     * Imports dinámicos en `run_claw.py`.
-    * Referencias a `CLAW_2024_06_19_...` en archivos que solo contienen la versión `2024-06-19_CLAW_...`.
+    * Referencias a `2024-06-19_CLAW_...` en archivos que solo contienen la versión `2024-06-19_CLAW_...`.
 * **DYNAMIC:** Uso de `importlib` para cargar el core.
 * **CIRCULAR:** Sospecha moderada en el triángulo `CORE -> AGENT -> TOOLS -> CORE`.
 
 ## 2. Incidencias Detalladas
 | Archivo | Línea | Import Detectado | Estado | Destino Esperado |
 | :--- | :--- | :--- | :--- | :--- |
-| `run_claw.py` | 12 | `CLAW_2024_06_19_CORE_V01` | BROKEN | `2024-06-19_CLAW_CORE_V01` |
-| `01_SRC/mcp/tools.py` | 19 | `CLAW_2024_06_19_TOOL_REGISTRY_V01` | BROKEN | `2024-06-19_CLAW_TOOL_REGISTRY_V01` |
+| `run_claw.py` | 12 | `2024-06-19_CLAW_CORE_V01` | BROKEN | `2024-06-19_CLAW_CORE_V01` |
+| `01_SRC/mcp/tools.py` | 19 | `2024-06-19_CLAW_TOOL_REGISTRY_V01` | BROKEN | `2024-06-19_CLAW_TOOL_REGISTRY_V01` |
 | `01_SRC/compaction.py` | 4 | `import providers` | BROKEN | `2024-06-19_CLAW_PROVIDERS_V01` |
 
 ## 3. Análisis de Dependencias

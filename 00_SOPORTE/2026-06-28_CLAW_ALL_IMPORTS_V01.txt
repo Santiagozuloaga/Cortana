@@ -86,9 +86,9 @@
 01_SRC/skills.py:from skill.executor import execute_skill  # noqa: F401
 01_SRC/skills.py:from skill.loader import _get_skill_paths as _gsp
 01_SRC/skill/tools.py:from __future__ import annotations
-01_SRC/skill/tools.py:from CLAW_2024_06_19_TOOL_REGISTRY_V01 import ToolDef, register_tool
+01_SRC/skill/tools.py:from 2024-06-19_CLAW_TOOL_REGISTRY_V01 import ToolDef, register_tool
 01_SRC/skill/tools.py:from .loader import find_skill, load_skills, substitute_arguments
-01_SRC/skill/tools.py:    import CLAW_2024_06_19_AGENT_V01 as _agent
+01_SRC/skill/tools.py:    import 2024-06-19_CLAW_AGENT_V01 as _agent
 01_SRC/skill/__init__.py:from .loader import (  # noqa: F401
 01_SRC/skill/__init__.py:from .executor import execute_skill  # noqa: F401
 01_SRC/skill/__init__.py:from . import builtin as _builtin  # noqa: F401
@@ -97,8 +97,8 @@
 01_SRC/skill/executor.py:from __future__ import annotations
 01_SRC/skill/executor.py:from typing import Generator
 01_SRC/skill/executor.py:from .loader import SkillDef, substitute_arguments
-01_SRC/skill/executor.py:    import CLAW_2024_06_19_AGENT_V01 as _agent
-01_SRC/skill/executor.py:    import CLAW_2024_06_19_AGENT_V01 as _agent
+01_SRC/skill/executor.py:    import 2024-06-19_CLAW_AGENT_V01 as _agent
+01_SRC/skill/executor.py:    import 2024-06-19_CLAW_AGENT_V01 as _agent
 01_SRC/skill/loader.py:from __future__ import annotations
 01_SRC/skill/loader.py:from dataclasses import dataclass, field
 01_SRC/skill/loader.py:from pathlib import Path
@@ -199,7 +199,7 @@
 01_SRC/mcp/tools.py:from __future__ import annotations
 01_SRC/mcp/tools.py:import threading
 01_SRC/mcp/tools.py:from typing import Dict, List, Optional
-01_SRC/mcp/tools.py:from CLAW_2024_06_19_TOOL_REGISTRY_V01 import ToolDef, register_tool
+01_SRC/mcp/tools.py:from 2024-06-19_CLAW_TOOL_REGISTRY_V01 import ToolDef, register_tool
 01_SRC/mcp/tools.py:from .client import MCPClient, MCPManager, get_mcp_manager
 01_SRC/mcp/tools.py:from .config import load_mcp_configs
 01_SRC/mcp/tools.py:from .types import MCPServerConfig, MCPTool
@@ -242,17 +242,17 @@
 01_SRC/2024-06-19_CLAW_MAIN_V01.py:from error_utils import tarea_segura, ejecutar_hook_seguro, TareaConCancelacion
 01_SRC/2024-06-19_CLAW_MAIN_V01.py:            import anthropic
 01_SRC/2024-06-19_CLAW_COMPACTION_V01.py:from __future__ import annotations
-01_SRC/2024-06-19_CLAW_COMPACTION_V01.py:import CLAW_2024_06_19_PROVIDERS_V01 as providers
+01_SRC/2024-06-19_CLAW_COMPACTION_V01.py:import 2024-06-19_CLAW_PROVIDERS_V01 as providers
 01_SRC/2024-06-19_CLAW_AGENT_V01.py:from __future__ import annotations
 01_SRC/2024-06-19_CLAW_AGENT_V01.py:import uuid
 01_SRC/2024-06-19_CLAW_AGENT_V01.py:from dataclasses import dataclass, field
 01_SRC/2024-06-19_CLAW_AGENT_V01.py:from typing import Generator
-01_SRC/2024-06-19_CLAW_AGENT_V01.py:from CLAW_2024_06_19_TOOL_REGISTRY_V01 import get_tool_schemas
-01_SRC/2024-06-19_CLAW_AGENT_V01.py:from CLAW_2024_06_19_TOOLS_V01 import execute_tool
-01_SRC/2024-06-19_CLAW_AGENT_V01.py:import CLAW_2024_06_19_TOOLS_V01 as _tools_init  # ensure built-in tools are registered on import
-01_SRC/2024-06-19_CLAW_AGENT_V01.py:from CLAW_2024_06_19_PROVIDERS_V01 import stream, AssistantTurn, TextChunk, ThinkingChunk, detect_provider
-01_SRC/2024-06-19_CLAW_AGENT_V01.py:from CLAW_2024_06_19_COMPACTION_V01 import maybe_compact
-01_SRC/2024-06-19_CLAW_AGENT_V01.py:        from CLAW_2024_06_19_TOOLS_V01 import _is_safe_bash
+01_SRC/2024-06-19_CLAW_AGENT_V01.py:from 2024-06-19_CLAW_TOOL_REGISTRY_V01 import get_tool_schemas
+01_SRC/2024-06-19_CLAW_AGENT_V01.py:from 2024-06-19_CLAW_TOOLS_V01 import execute_tool
+01_SRC/2024-06-19_CLAW_AGENT_V01.py:import 2024-06-19_CLAW_TOOLS_V01 as _tools_init  # ensure built-in tools are registered on import
+01_SRC/2024-06-19_CLAW_AGENT_V01.py:from 2024-06-19_CLAW_PROVIDERS_V01 import stream, AssistantTurn, TextChunk, ThinkingChunk, detect_provider
+01_SRC/2024-06-19_CLAW_AGENT_V01.py:from 2024-06-19_CLAW_COMPACTION_V01 import maybe_compact
+01_SRC/2024-06-19_CLAW_AGENT_V01.py:        from 2024-06-19_CLAW_TOOLS_V01 import _is_safe_bash
 01_SRC/2024-06-19_CLAW_TOOLS_V01.py:import json
 01_SRC/2024-06-19_CLAW_TOOLS_V01.py:import os
 01_SRC/2024-06-19_CLAW_TOOLS_V01.py:import re
@@ -281,7 +281,7 @@
 01_SRC/2024-06-19_CLAW_TOOLS_V01.py:# task/tools.py registers all four tools into the central registry on import.
 01_SRC/2024-06-19_CLAW_TOOLS_V01.py:import task.tools as _task_tools  # noqa: F401
 01_SRC/task/tools.py:from __future__ import annotations
-01_SRC/task/tools.py:from CLAW_2024_06_19_TOOL_REGISTRY_V01 import ToolDef, register_tool
+01_SRC/task/tools.py:from 2024-06-19_CLAW_TOOL_REGISTRY_V01 import ToolDef, register_tool
 01_SRC/task/tools.py:from .store import create_task, get_task, list_tasks, update_task, delete_task
 01_SRC/task/tools.py:from .types import TaskStatus
 01_SRC/task/__init__.py:from .types import Task, TaskStatus
@@ -373,7 +373,7 @@
 01_SRC/plugin/loader.py:from .store import list_plugins
 01_SRC/plugin/loader.py:from .types import PluginEntry, PluginScope
 01_SRC/plugin/loader.py:            mod = _import_plugin_module(entry, module_name)
-01_SRC/plugin/loader.py:    from CLAW_2024_06_19_TOOL_REGISTRY_V01 import register_tool, ToolDef
+01_SRC/plugin/loader.py:    from 2024-06-19_CLAW_TOOL_REGISTRY_V01 import register_tool, ToolDef
 01_SRC/plugin/loader.py:            mod = _import_plugin_module(entry, module_name)
 01_SRC/plugin/loader.py:def _import_plugin_module(entry: PluginEntry, module_name: str):
 01_SRC/plugin/loader.py:    """Dynamically import a module from a plugin directory."""
@@ -398,7 +398,7 @@
 01_SRC/2024-06-19_CLAW_SKILL_V01/loader.py:from pathlib import Path
 01_SRC/2024-06-19_CLAW_SKILL_V01/loader.py:from typing import Optional
 01_SRC/multi_agent/tools.py:from __future__ import annotations
-01_SRC/multi_agent/tools.py:from CLAW_2024_06_19_TOOL_REGISTRY_V01 import ToolDef, register_tool
+01_SRC/multi_agent/tools.py:from 2024-06-19_CLAW_TOOL_REGISTRY_V01 import ToolDef, register_tool
 01_SRC/multi_agent/tools.py:from .subagent import SubAgentManager, get_agent_definition, load_agent_definitions
 01_SRC/multi_agent/__init__.py:from .subagent import (
 01_SRC/multi_agent/subagent.py:from __future__ import annotations
@@ -414,8 +414,8 @@
 01_SRC/multi_agent/subagent.py:                import yaml as _yaml
 01_SRC/multi_agent/subagent.py:    """Lazy-import wrapper to avoid circular dependency with agent module.
 01_SRC/multi_agent/subagent.py:    Uses absolute import so this works whether called from inside or outside
-01_SRC/multi_agent/subagent.py:    import CLAW_2024_06_19_AGENT_V01 as _agent_mod
-01_SRC/multi_agent/subagent.py:            import CLAW_2024_06_19_AGENT_V01 as _agent_mod; AgentState = _agent_mod.AgentState
+01_SRC/multi_agent/subagent.py:    import 2024-06-19_CLAW_AGENT_V01 as _agent_mod
+01_SRC/multi_agent/subagent.py:            import 2024-06-19_CLAW_AGENT_V01 as _agent_mod; AgentState = _agent_mod.AgentState
 01_SRC/2024-06-19_CLAW_SKILLS_SHIM_V01.py:from skill.loader import (  # noqa: F401
 01_SRC/2024-06-19_CLAW_SKILLS_SHIM_V01.py:from skill.executor import execute_skill  # noqa: F401
 01_SRC/2024-06-19_CLAW_SKILLS_SHIM_V01.py:from skill.loader import _get_skill_paths as _gsp
@@ -426,7 +426,7 @@
 01_SRC/2024-06-19_CLAW_CONTEXT_V01.py:import subprocess
 01_SRC/2024-06-19_CLAW_CONTEXT_V01.py:from pathlib import Path
 01_SRC/2024-06-19_CLAW_CONTEXT_V01.py:from datetime import datetime
-01_SRC/2024-06-19_CLAW_CONTEXT_V01.py:from CLAW_2024_06_19_MEMORY_SHIM_V01 import get_memory_context
+01_SRC/2024-06-19_CLAW_CONTEXT_V01.py:from 2024-06-19_CLAW_MEMORY_SHIM_V01 import get_memory_context
 01_SRC/2024-06-19_CLAW_CONTEXT_V01.py:    import platform
 01_SRC/2024-06-19_CLAW_ALTERNATIVE_V01.py:# ██ INICIO SEGURO — UTF-8 ANTES de cualquier import que use print/logging ██
 01_SRC/2024-06-19_CLAW_ALTERNATIVE_V01.py:import sys
@@ -485,7 +485,7 @@
 01_SRC/context.py:    import platform
 01_SRC/memory/tools.py:from __future__ import annotations
 01_SRC/memory/tools.py:from datetime import datetime
-01_SRC/memory/tools.py:from CLAW_2024_06_19_TOOL_REGISTRY_V01 import ToolDef, register_tool
+01_SRC/memory/tools.py:from 2024-06-19_CLAW_TOOL_REGISTRY_V01 import ToolDef, register_tool
 01_SRC/memory/tools.py:from .store import MemoryEntry, save_memory, delete_memory, load_index, check_conflict, touch_last_used
 01_SRC/memory/tools.py:from .context import find_relevant_memories
 01_SRC/memory/tools.py:from .scan import scan_all_memories, format_memory_manifest
@@ -508,12 +508,12 @@
 01_SRC/memory/context.py:from .scan import scan_all_memories, format_memory_manifest, memory_freshness_text
 01_SRC/memory/context.py:from .types import MEMORY_SYSTEM_PROMPT
 01_SRC/memory/context.py:        from .scan import scan_all_memories
-01_SRC/memory/context.py:        from CLAW_2024_06_19_PROVIDERS_V01 import stream, AssistantTurn
+01_SRC/memory/context.py:        from 2024-06-19_CLAW_PROVIDERS_V01 import stream, AssistantTurn
 01_SRC/memory/context.py:        from .scan import scan_all_memories
 01_SRC/memory/context.py:        import json as _json
 01_SRC/memory/consolidator.py:from __future__ import annotations
 01_SRC/memory/consolidator.py:from datetime import datetime
-01_SRC/memory/consolidator.py:        from CLAW_2024_06_19_PROVIDERS_V01 import stream, AssistantTurn
+01_SRC/memory/consolidator.py:        from 2024-06-19_CLAW_PROVIDERS_V01 import stream, AssistantTurn
 01_SRC/memory/consolidator.py:        from .store import MemoryEntry, save_memory, check_conflict
 01_SRC/memory/consolidator.py:        import json
 01_SRC/memory/store.py:from __future__ import annotations
@@ -681,40 +681,40 @@
 01_SRC/2024-06-19_CLAW_CORE_V01.py:    import random
 01_SRC/2024-06-19_CLAW_CORE_V01.py:import time
 01_SRC/2024-06-19_CLAW_CORE_V01.py:import traceback
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_PROVIDERS_V01 import PROVIDERS, detect_provider
-01_SRC/2024-06-19_CLAW_CORE_V01.py:        from CLAW_2024_06_19_CONFIG_V01 import save_config
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_PROVIDERS_V01 import stream, TextChunk
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_PROVIDERS_V01 import PROVIDERS, detect_provider
+01_SRC/2024-06-19_CLAW_CORE_V01.py:        from 2024-06-19_CLAW_CONFIG_V01 import save_config
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_PROVIDERS_V01 import stream, TextChunk
 01_SRC/2024-06-19_CLAW_CORE_V01.py:    import json
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_PROVIDERS_V01 import PROVIDERS, list_ollama_models
-01_SRC/2024-06-19_CLAW_CORE_V01.py:            from CLAW_2024_06_19_CONFIG_V01 import save_config
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_PROVIDERS_V01 import stream
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_PROVIDERS_V01 import PROVIDERS, list_ollama_models
+01_SRC/2024-06-19_CLAW_CORE_V01.py:            from 2024-06-19_CLAW_CONFIG_V01 import save_config
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_PROVIDERS_V01 import stream
 01_SRC/2024-06-19_CLAW_CORE_V01.py:    import time
 01_SRC/2024-06-19_CLAW_CORE_V01.py:    from pathlib import Path
 01_SRC/2024-06-19_CLAW_CORE_V01.py:            from faker import Faker
 01_SRC/2024-06-19_CLAW_CORE_V01.py:            import random
-01_SRC/2024-06-19_CLAW_CORE_V01.py:            from CLAW_2024_06_19_PROVIDERS_V01 import TextChunk
+01_SRC/2024-06-19_CLAW_CORE_V01.py:            from 2024-06-19_CLAW_PROVIDERS_V01 import TextChunk
 01_SRC/2024-06-19_CLAW_CORE_V01.py:    from pathlib import Path
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_CONFIG_V01 import save_config
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_CONFIG_V01 import SESSIONS_DIR
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_CONFIG_V01 import save_config
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_CONFIG_V01 import SESSIONS_DIR
 01_SRC/2024-06-19_CLAW_CORE_V01.py:    import uuid
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_CONFIG_V01 import MR_SESSION_DIR, DAILY_DIR, SESSION_HIST_FILE
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_CONFIG_V01 import MR_SESSION_DIR, DAILY_DIR, SESSION_HIST_FILE
 01_SRC/2024-06-19_CLAW_CORE_V01.py:    import uuid
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_CONFIG_V01 import SESSIONS_DIR, MR_SESSION_DIR, DAILY_DIR
-01_SRC/2024-06-19_CLAW_CORE_V01.py:        from CLAW_2024_06_19_CONFIG_V01 import SESSION_HIST_FILE
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_CONFIG_V01 import MR_SESSION_DIR
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_CONFIG_V01 import SESSIONS_DIR, MR_SESSION_DIR, DAILY_DIR
+01_SRC/2024-06-19_CLAW_CORE_V01.py:        from 2024-06-19_CLAW_CONFIG_V01 import SESSION_HIST_FILE
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_CONFIG_V01 import MR_SESSION_DIR
 01_SRC/2024-06-19_CLAW_CORE_V01.py:    import anthropic
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_CONFIG_V01 import calc_cost
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_CONFIG_V01 import save_config
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_CONFIG_V01 import save_config
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_CONFIG_V01 import save_config
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_CONFIG_V01 import calc_cost
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_CONFIG_V01 import save_config
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_CONFIG_V01 import save_config
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_CONFIG_V01 import save_config
 01_SRC/2024-06-19_CLAW_CORE_V01.py:    import uuid
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_CLOUDSAVE_V01 import validate_token, upload_session, list_sessions, download_session
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_CONFIG_V01 import save_config
-01_SRC/2024-06-19_CLAW_CORE_V01.py:        from CLAW_2024_06_19_CLOUDSAVE_V01 import upload_session
-01_SRC/2024-06-19_CLAW_CORE_V01.py:        from CLAW_2024_06_19_CONFIG_V01 import save_config
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_MEMORY_SHIM_V01 import search_memory, load_index
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_CLOUDSAVE_V01 import validate_token, upload_session, list_sessions, download_session
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_CONFIG_V01 import save_config
+01_SRC/2024-06-19_CLAW_CORE_V01.py:        from 2024-06-19_CLAW_CLOUDSAVE_V01 import upload_session
+01_SRC/2024-06-19_CLAW_CORE_V01.py:        from 2024-06-19_CLAW_CONFIG_V01 import save_config
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_MEMORY_SHIM_V01 import search_memory, load_index
 01_SRC/2024-06-19_CLAW_CORE_V01.py:    from memory.scan import scan_all_memories, format_memory_manifest, memory_freshness_text
-01_SRC/2024-06-19_CLAW_CORE_V01.py:        from CLAW_2024_06_19_MEMORY_SHIM_V01 import consolidate_session
+01_SRC/2024-06-19_CLAW_CORE_V01.py:        from 2024-06-19_CLAW_MEMORY_SHIM_V01 import consolidate_session
 01_SRC/2024-06-19_CLAW_CORE_V01.py:        from multi_agent.tools import get_agent_manager
 01_SRC/2024-06-19_CLAW_CORE_V01.py:        from multi_agent.tools import get_agent_manager
 01_SRC/2024-06-19_CLAW_CORE_V01.py:    from skill import load_skills
@@ -730,7 +730,7 @@
 01_SRC/2024-06-19_CLAW_CORE_V01.py:    import shlex
 01_SRC/2024-06-19_CLAW_CORE_V01.py:    from pathlib import Path
 01_SRC/2024-06-19_CLAW_CORE_V01.py:    import urllib.request, urllib.parse
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_CONFIG_V01 import save_config
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_CONFIG_V01 import save_config
 01_SRC/2024-06-19_CLAW_CORE_V01.py:            from voice import check_voice_deps, check_recording_availability, check_stt_availability
 01_SRC/2024-06-19_CLAW_CORE_V01.py:            from voice.stt import get_stt_backend_name
 01_SRC/2024-06-19_CLAW_CORE_V01.py:        from voice import check_voice_deps, voice_input as _voice_input
@@ -738,22 +738,22 @@
 01_SRC/2024-06-19_CLAW_CORE_V01.py:        from PIL import ImageGrab
 01_SRC/2024-06-19_CLAW_CORE_V01.py:        import io, base64
 01_SRC/2024-06-19_CLAW_CORE_V01.py:    from skill import find_skill
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_CONFIG_V01 import HISTORY_FILE
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_CONTEXT_V01 import build_system_prompt
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_AGENT_V01 import AgentState, run, TextChunk, ThinkingChunk, ToolStart, ToolEnd, TurnDone, PermissionRequest
-01_SRC/2024-06-19_CLAW_CORE_V01.py:        from CLAW_2024_06_19_PROVIDERS_V01 import detect_provider
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_CONFIG_V01 import HISTORY_FILE
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_CONTEXT_V01 import build_system_prompt
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_AGENT_V01 import AgentState, run, TextChunk, ThinkingChunk, ToolStart, ToolEnd, TurnDone, PermissionRequest
+01_SRC/2024-06-19_CLAW_CORE_V01.py:        from 2024-06-19_CLAW_PROVIDERS_V01 import detect_provider
 01_SRC/2024-06-19_CLAW_CORE_V01.py:    import os as _os
 01_SRC/2024-06-19_CLAW_CORE_V01.py:                import urllib.error
-01_SRC/2024-06-19_CLAW_CORE_V01.py:                    from CLAW_2024_06_19_PROVIDERS_V01 import detect_provider
-01_SRC/2024-06-19_CLAW_CORE_V01.py:        from CLAW_2024_06_19_TOOLS_V01 import drain_pending_questions
+01_SRC/2024-06-19_CLAW_CORE_V01.py:                    from 2024-06-19_CLAW_PROVIDERS_V01 import detect_provider
+01_SRC/2024-06-19_CLAW_CORE_V01.py:        from 2024-06-19_CLAW_TOOLS_V01 import drain_pending_questions
 01_SRC/2024-06-19_CLAW_CORE_V01.py:        import select as _sel
 01_SRC/2024-06-19_CLAW_CORE_V01.py:            import time as _time
 01_SRC/2024-06-19_CLAW_CORE_V01.py:                import msvcrt
 01_SRC/2024-06-19_CLAW_CORE_V01.py:                import random as _random
 01_SRC/2024-06-19_CLAW_CORE_V01.py:                from skill import substitute_arguments
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_CONFIG_V01 import load_config, save_config, has_api_key
-01_SRC/2024-06-19_CLAW_CORE_V01.py:    from CLAW_2024_06_19_PROVIDERS_V01 import detect_provider, PROVIDERS
-01_SRC/2024-06-19_CLAW_CORE_V01.py:            from CLAW_2024_06_19_PROVIDERS_V01 import PROVIDERS
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_CONFIG_V01 import load_config, save_config, has_api_key
+01_SRC/2024-06-19_CLAW_CORE_V01.py:    from 2024-06-19_CLAW_PROVIDERS_V01 import detect_provider, PROVIDERS
+01_SRC/2024-06-19_CLAW_CORE_V01.py:            from 2024-06-19_CLAW_PROVIDERS_V01 import PROVIDERS
 01_SRC/2024-06-19_CLAW_CORE_V01.py:import time as _sage_time
 01_SRC/2024-06-19_CLAW_PROVIDERS_V01.py:from __future__ import annotations
 01_SRC/2024-06-19_CLAW_PROVIDERS_V01.py:import json
@@ -875,9 +875,9 @@
 00_SOPORTE/2024-06-19_CLAW_CONFIG_V01.py:import os
 00_SOPORTE/2024-06-19_CLAW_CONFIG_V01.py:import json
 00_SOPORTE/2024-06-19_CLAW_CONFIG_V01.py:from pathlib import Path
-00_SOPORTE/2024-06-19_CLAW_CONFIG_V01.py:    from CLAW_2024_06_19_PROVIDERS_V01 import detect_provider
-00_SOPORTE/2024-06-19_CLAW_CONFIG_V01.py:    from CLAW_2024_06_19_PROVIDERS_V01 import get_api_key
-00_SOPORTE/2024-06-19_CLAW_CONFIG_V01.py:    from CLAW_2024_06_19_PROVIDERS_V01 import calc_cost as _cc
+00_SOPORTE/2024-06-19_CLAW_CONFIG_V01.py:    from 2024-06-19_CLAW_PROVIDERS_V01 import detect_provider
+00_SOPORTE/2024-06-19_CLAW_CONFIG_V01.py:    from 2024-06-19_CLAW_PROVIDERS_V01 import get_api_key
+00_SOPORTE/2024-06-19_CLAW_CONFIG_V01.py:    from 2024-06-19_CLAW_PROVIDERS_V01 import calc_cost as _cc
 00_SOPORTE/config.py:import os
 00_SOPORTE/config.py:import json
 00_SOPORTE/config.py:from pathlib import Path
@@ -887,4 +887,4 @@
 run_claw.py:import sys
 run_claw.py:from pathlib import Path
 run_claw.py:import importlib
-run_claw.py:core = importlib.import_module("CLAW_2024_06_19_CORE_V01")
+run_claw.py:core = importlib.import_module("2024-06-19_CLAW_CORE_V01")

@@ -19,6 +19,7 @@ El repositorio CLAW_FINAL está organizado bajo el estándar **P.A.R.A.** y util
 - **config.py**: Gestión centralizada de configuración.
 
 ## Cambios Recientes (2026-07-04)
+- **Corrección ISO-SAGE**: Estandarización de toda la nomenclatura de archivos al formato `YYYY-MM-DD_CLAW_...` y actualización de todas las referencias internas en código y documentación.
 - **Fix Bug #7**: Implementación de caché TTL (5s) para variables de entorno en `providers.py` para mejorar el rendimiento y permitir actualizaciones dinámicas sin reinicio.
 - **Optimización REPL**: Caché de `SubAgentManager` en `clawspring.py` para evitar re-importaciones costosas en el bucle principal.
 - **Git Fix**: Reparación de bucle infinito en el enlace simbólico de `.gitignore`.

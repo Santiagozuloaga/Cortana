@@ -7,7 +7,7 @@
 
 ### 1. Hallazgos Principales
 * **HECHO VERIFICADO:** El repositorio presenta una dualidad estructural en `01_SRC/`. Existen carpetas con nombres estándar (ej. `mcp/`) y versiones con nomenclatura ISO-SAGE (ej. `2024-06-19_CLAW_MCP_V01/`).
-* **HECHO VERIFICADO:** El punto de entrada `run_claw.py` está roto. Intenta importar `CLAW_2024_06_19_CORE_V01` de forma dinámica, pero el archivo real se llama `2024-06-19_CLAW_CORE_V01.py`.
+* **HECHO VERIFICADO:** El punto de entrada `run_claw.py` está roto. Intenta importar `2024-06-19_CLAW_CORE_V01` de forma dinámica, pero el archivo real se llama `2024-06-19_CLAW_CORE_V01.py`.
 * **HECHO VERIFICADO:** Existe una inconsistencia en la aplicación del estándar ISO-SAGE. Se detectaron dos formatos: el oficial (`AAAA-MM-DD_CLAW_...`) y el erróneo ("Formato Jules": `CLAW_AAAA_MM_DD_...`).
 * **HECHO VERIFICADO:** No hay errores de sintaxis (`SyntaxError`) en los archivos principales, lo que indica que el código es legible por el intérprete, pero no ejecutable por fallos de importación.
 

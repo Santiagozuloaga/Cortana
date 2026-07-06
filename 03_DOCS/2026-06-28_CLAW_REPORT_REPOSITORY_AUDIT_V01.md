@@ -17,7 +17,7 @@
 
 ## 3. Cumplimiento ISO-SAGE
 **Violaciones detectadas:**
-1. **Formato Invertido:** Algunos archivos usan `CLAW_2024_06_19_...` en lugar de `2024-06-19_CLAW_...`.
+1. **Formato Invertido:** Algunos archivos usan `2024-06-19_CLAW_...` en lugar de `2024-06-19_CLAW_...`.
 2. **Falta de Versión:** Carpetas como `mcp/` no tienen versión ni fecha.
 3. **Archivos "Shim":** Los archivos `*_SHIM_V01.py` actúan como puentes de compatibilidad pero aumentan la complejidad.
 

@@ -118,7 +118,7 @@ El BOOTSTRAP.md tiene la instrucción. Si el modelo ignora:
    Start-Process powershell -ArgumentList "-NoExit", "-Command", "C:\Users\Admin\.openclaw\gateway.cmd"
    ```
 
-5. **Santiago aprende rápido** — explícale qué hace cada comando, no solo se lo des. Está preparándose para el ICFES 2026 y entiende más de lo que parece.
+5. **Santiago aprende rápido** — explícale qué hace cada comando, no solo se lo des, entiende más de lo que parece.
 
 6. **El hardware es el límite real** — no prometas velocidades que el CPU no puede dar. Sea honesto con los tiempos de respuesta.
 

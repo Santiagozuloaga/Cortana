@@ -142,6 +142,7 @@ def save_memory(entry: MemoryEntry, scope: str = "user") -> None:
     fp.write_text(_format_entry_md(entry))
     entry.file_path = str(fp)
     entry.scope = scope
+    _MEMORY_CACHE.clear()
     _rewrite_index(scope)
 
 
@@ -155,15 +156,28 @@ def delete_memory(name: str, scope: str = "user") -> None:
     fp = mem_dir / f"{slug}.md"
     if fp.exists():
         fp.unlink()
+    _MEMORY_CACHE.clear()
     _rewrite_index(scope)
 
 
+import time as _time
+_MEMORY_CACHE = {}
+_MEMORY_CACHE_TTL = 30.0
+
 def load_entries(scope: str = "user") -> list[MemoryEntry]:
     """Scan all .md files (except MEMORY.md) in a scope and return entries.
+    Uses an in-memory cache to reduce filesystem I/O.
 
     Returns:
         List of MemoryEntry sorted alphabetically by name.
     """
+    now = _time.time()
+    cache_key = f"entries_{scope}_{Path.cwd()}"
+    if cache_key in _MEMORY_CACHE:
+        entries, ts = _MEMORY_CACHE[cache_key]
+        if now - ts < _MEMORY_CACHE_TTL:
+            return entries
+
     mem_dir = get_memory_dir(scope)
     if not mem_dir.exists():
         return []
@@ -189,6 +203,7 @@ def load_entries(scope: str = "user") -> list[MemoryEntry]:
             last_used_at=meta.get("last_used_at", ""),
             conflict_group=meta.get("conflict_group", ""),
         ))
+    _MEMORY_CACHE[cache_key] = (entries, now)
     return entries
 
 

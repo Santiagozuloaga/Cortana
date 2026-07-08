@@ -4,11 +4,11 @@
 
 | ID | Fecha | Tarea | Estado | Responsable |
 |----|-------|-------|--------|-------------|
-| T-2026-07-04-01 | 2026-07-04 | Inicializar repo Git y fijar .gitignore | Completada | Jules |
-| T-2026-07-04-02 | 2026-07-04 | Corregir Bug #7 (env cache en providers.py) | Completada | Jules |
-| T-2026-07-04-03 | 2026-07-04 | Optimizar clawspring.py (SubAgentManager cache) | Completada | Jules |
-| T-2026-07-04-04 | 2026-07-04 | Crear script de benchmark Ollama | Completada | Jules |
-| T-2026-07-04-05 | 2026-07-04 | Generar documentación mandatoria (MASTER_STATE, etc) | Completada | Jules |
+| T-2026-07-07-01 | 2026-07-07 | Perfilado completo de ciclo de ejecución | Completada | Jules |
+| T-2026-07-07-02 | 2026-07-07 | Análisis de cuellos de botella (Top 10) | Completada | Jules |
+| T-2026-07-07-03 | 2026-07-07 | Optimización de estimación de tokens | Completada | Jules |
+| T-2026-07-07-04 | 2026-07-07 | Implementación de caché de memoria TTL | Completada | Jules |
+| T-2026-07-07-05 | 2026-07-07 | Benchmark comparativo Ollama (múltiples modelos) | Completada | Jules |
 
 ## Historial de Tareas Recientes
 

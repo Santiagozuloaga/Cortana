@@ -8,31 +8,41 @@ import providers as providers
 
 def estimate_tokens(messages: list) -> int:
     """Estimate token count by summing content lengths / 3.5.
+    Uses cached token counts if available in the message dict.
 
     Args:
         messages: list of message dicts with "content" field (str or list of dicts)
     Returns:
         approximate token count, int
     """
-    total_chars = 0
+    total_tokens = 0
     for m in messages:
+        if "_est_tokens" in m:
+            total_tokens += m["_est_tokens"]
+            continue
+
+        chars = 0
         content = m.get("content", "")
         if isinstance(content, str):
-            total_chars += len(content)
+            chars += len(content)
         elif isinstance(content, list):
             for block in content:
                 if isinstance(block, dict):
-                    # Sum all string values in the block
                     for v in block.values():
                         if isinstance(v, str):
-                            total_chars += len(v)
-        # Also count tool_calls if present
+                            chars += len(v)
+
         for tc in m.get("tool_calls", []):
             if isinstance(tc, dict):
                 for v in tc.values():
                     if isinstance(v, str):
-                        total_chars += len(v)
-    return int(total_chars / 3.5)
+                        chars += len(v)
+
+        est = int(chars / 3.5)
+        m["_est_tokens"] = est
+        total_tokens += est
+
+    return total_tokens
 
 
 def get_context_limit(model: str) -> int:

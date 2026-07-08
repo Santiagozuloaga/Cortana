@@ -12,7 +12,7 @@ _CONTEXT_CACHE = {
     "git": {"data": "", "ts": 0},
     "claude": {"data": "", "ts": 0, "cwd": ""},
 }
-_CACHE_TTL = 2.0  # 2 seconds TTL
+_CACHE_TTL = 10.0  # Increased to 10 seconds for long sessions
 
 SYSTEM_PROMPT_TEMPLATE = """\
 You are ClawSpring, Created by SAIL Lab (Safe AI and Robot Learning Lab at UC Berkeley), an AI coding assistant running in the terminal.

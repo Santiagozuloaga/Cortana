@@ -2690,8 +2690,6 @@ def repl(config: dict, initial_prompt: str = None):
             return _build_sp_claw()
         return _build_system_prompt_orig()
 
-    _ANSI_RE = re.compile(r'\x1b\[[0-9;]*m')
-
     setup_readline(HISTORY_FILE)
     state = AgentState()
     verbose = config.get("verbose", False)
@@ -3426,6 +3424,23 @@ if __name__ == "__main__":
 import time as _sage_time
 _sage_start_time = _sage_time.time()
 
+_ANSI_RE = re.compile(r'\x1b\[[0-9;]*m')
+
 def sage_check_cooling():
     if _sage_time.time() - _sage_start_time > 3000: # 50 minutes
-        print("\n[ALERTA DE ENFRIAMIENTO] La ejecución ha superado los 50 minutos.")
+        msg = "[ALERTA DE ENFRIAMIENTO] La ejecución ha superado los 50 minutos."
+        print(f"\n{msg}")
+        try:
+            # Use absolute path relative to script directory if possible
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            # Path for PARA 00_SOPORTE
+            log_dir = os.path.join(os.path.dirname(base_dir), "00_SOPORTE")
+            if not os.path.exists(log_dir):
+                os.makedirs(log_dir, exist_ok=True)
+
+            log_path = os.path.join(log_dir, "2024-06-19_CLAW_COOLING_LOG_V01.txt")
+            from datetime import datetime as _dt
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(f"{_dt.now().isoformat()} - {msg}\n")
+        except Exception:
+            pass

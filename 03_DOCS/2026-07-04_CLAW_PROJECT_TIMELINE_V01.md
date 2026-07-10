@@ -16,6 +16,10 @@
   - Auditoría final de nomenclatura y estructura.
   - Consolidación de historial de tareas y chats.
   - Verificación total de integridad del repositorio.
+- **2026-07-10**:
+  - Optimización de regex en REPL.
+  - Implementación de log de enfriamiento ISO-SAGE.
+  - Baselines de performance Ollama (Qwen2.5/Llama3.2).
 
 ### Fase 3: Integración Avanzada (Planificada)
 - Mejora de capacidades multi-agente.

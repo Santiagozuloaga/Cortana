@@ -81,13 +81,7 @@ if sys.platform == "win32":
     except Exception:
         pass  # chcp no crítico — el reconfigure ya fijó UTF-8
 import json
-try:
-    import readline
-except ImportError:
-    readline = None  # Windows compatibility
 import atexit
-import argparse
-import textwrap
 from pathlib import Path
 from datetime import datetime
 from typing import Optional, Union
@@ -2614,7 +2608,9 @@ _CMD_META: dict[str, tuple[str, list[str]]] = {
 
 
 def setup_readline(history_file: Path):
-    if readline is None:
+    try:
+        import readline
+    except ImportError:
         return
     try:
         readline.read_history_file(str(history_file))
@@ -3344,6 +3340,7 @@ def repl(config: dict, initial_prompt: str = None):
 # ── Entry point ────────────────────────────────────────────────────────────
 
 def main():
+    import argparse
     parser = argparse.ArgumentParser(
         prog="clawspring",
         description="ClawSpring — minimal Python Claude Code implementation",

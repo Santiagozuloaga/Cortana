@@ -52,6 +52,9 @@ def test_providers_cache():
     # Change env
     os.environ[caps_var] = "thinking,tools"
 
+    print("Waiting 6 seconds for TTL cache...")
+    time.sleep(6)
+
     res = _model_supports_thinking(model)
     print(f"After env change (providers): {model} support thinking? {res}")
 

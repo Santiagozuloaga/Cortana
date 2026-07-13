@@ -184,15 +184,18 @@ def _start_live() -> None:
                              vertical_overflow="visible")
         _current_live.start()
 
+import re as _re
+_FORMATTING_CHARS_RE = _re.compile(r'[#*`_\[\n]')
+
 def stream_text(chunk: str) -> None:
     """Buffer chunk; update Live in-place when Rich available, else print directly."""
     global _current_live
     _accumulated_text.append(chunk)
-    if _init_rich() and _RICH_LIVE:
+    if _RICH and _RICH_LIVE:
         if _current_live is None:
             _start_live()
         # Only update if chunk contains potentially formatting-changing characters
-        if any(c in chunk for c in ("#", "*", "`", "_", "[", "\n")):
+        if _FORMATTING_CHARS_RE.search(chunk):
             _current_live.update(_make_renderable("".join(_accumulated_text)), refresh=True)
         else:
             _current_live.update(_make_renderable("".join(_accumulated_text)), refresh=False)
@@ -2786,8 +2789,10 @@ def repl(config: dict, initial_prompt: str = None):
             spinner_shown = True
             _start_tool_spinner()
             _pre_tool_text = []   # text chunks before a tool call
+            _pre_text_joined = ""
             _post_tool = False    # true after a tool has executed
             _post_tool_buf = []   # text chunks after tool (to check for duplicates)
+            _post_so_far_joined = ""
             _duplicate_suppressed = False
 
             try:
@@ -2810,20 +2815,26 @@ def repl(config: dict, initial_prompt: str = None):
                         if _post_tool and not _duplicate_suppressed:
                             # Buffer post-tool text to check for duplicates
                             _post_tool_buf.append(event.text)
-                            post_so_far = "".join(_post_tool_buf).strip()
-                            pre_text = "".join(_pre_tool_text).strip()
+                            _post_so_far_joined += event.text
+                            post_stripped = _post_so_far_joined.strip()
+
+                            if not _pre_text_joined:
+                                _pre_text_joined = "".join(_pre_tool_text).strip()
+
                             # If post-tool text matches start of pre-tool text, suppress
-                            if pre_text and pre_text.startswith(post_so_far):
-                                if len(post_so_far) >= len(pre_text):
+                            if _pre_text_joined and _pre_text_joined.startswith(post_stripped):
+                                if len(post_stripped) >= len(_pre_text_joined):
                                     # Full duplicate confirmed — suppress entirely
                                     _duplicate_suppressed = True
                                     _post_tool_buf.clear()
+                                    _post_so_far_joined = ""
                                 continue
-                            elif post_so_far and not pre_text.startswith(post_so_far):
+                            elif post_stripped and not _pre_text_joined.startswith(post_stripped):
                                 # Not a duplicate — flush buffered text
                                 for chunk in _post_tool_buf:
                                     stream_text(chunk)
                                 _post_tool_buf.clear()
+                                _post_so_far_joined = ""
                                 _duplicate_suppressed = True  # stop checking
                                 continue
 

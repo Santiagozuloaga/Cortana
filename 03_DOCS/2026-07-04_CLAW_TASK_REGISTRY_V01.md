@@ -4,6 +4,7 @@
 
 | ID | Fecha | Tarea | Estado | Responsable |
 |----|-------|-------|--------|-------------|
+| CLAW-REP-01 | 2026-07-13 | Generar Reporte Total de Acciones y Flujo de IAs | Completada | Jules |
 | CLAW-AUDIT-01 | 2026-07-08 | Auditoría Final ISO-SAGE y corrección de nomenclatura | Completada | Jules |
 | CLAW-AUDIT-02 | 2026-07-08 | Consolidación estructural P.A.R.A. y limpieza de raíz | Completada | Jules |
 | CLAW-DOC-01 | 2026-07-08 | Generar Informe Consolidado Total de Tareas y Chats | Completada | Jules |

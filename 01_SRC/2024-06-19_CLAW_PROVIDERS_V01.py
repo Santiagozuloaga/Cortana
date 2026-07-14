@@ -20,6 +20,7 @@ Model string formats:
   "custom/my-model"          uses CUSTOM_BASE_URL from config
 """
 from __future__ import annotations
+from functools import lru_cache
 import json
 import logging
 import os
@@ -188,6 +189,7 @@ _PREFIXES = [
 ]
 
 
+@lru_cache(maxsize=128)
 def detect_provider(model: str) -> str:
     """Return provider name for a model string.
     Supports 'provider/model' explicit format, or auto-detect by prefix."""
@@ -199,6 +201,7 @@ def detect_provider(model: str) -> str:
     return "openai"   # fallback
 
 
+@lru_cache(maxsize=128)
 def bare_model(model: str) -> str:
     """Strip 'provider/' prefix if present."""
     return model.split("/", 1)[1] if "/" in model else model

@@ -93,6 +93,8 @@ _BUILTIN_AGENTS: Dict[str, AgentDefinition] = {
 
 # ── Loading agent definitions from .md files ──────────────────────────────
 
+_AGENT_DEF_CACHE: Dict[str, tuple[float, AgentDefinition]] = {}
+
 def _parse_agent_md(path: Path, source: str = "user") -> AgentDefinition:
     """Parse a .md file with optional YAML frontmatter into an AgentDefinition.
 
@@ -149,6 +151,7 @@ def _parse_agent_md(path: Path, source: str = "user") -> AgentDefinition:
 
 def load_agent_definitions() -> Dict[str, AgentDefinition]:
     """Load all agent definitions: built-ins → user-level → project-level.
+    Uses a mtime-based cache to avoid redundant parsing.
 
     Search paths:
       ~/.clawspring/agents/*.md   (user-level)
@@ -156,25 +159,35 @@ def load_agent_definitions() -> Dict[str, AgentDefinition]:
     """
     defs: Dict[str, AgentDefinition] = dict(_BUILTIN_AGENTS)
 
+    def _get_from_cache_or_parse(p: Path, source: str) -> AgentDefinition | None:
+        try:
+            mtime = p.stat().st_mtime
+            cache_key = f"{source}:{p!s}"
+            if cache_key in _AGENT_DEF_CACHE:
+                cached_mtime, cached_def = _AGENT_DEF_CACHE[cache_key]
+                if cached_mtime == mtime:
+                    return cached_def
+            d = _parse_agent_md(p, source=source)
+            _AGENT_DEF_CACHE[cache_key] = (mtime, d)
+            return d
+        except Exception:
+            return None
+
     # User-level
     user_dir = Path.home() / ".clawspring" / "agents"
     if user_dir.is_dir():
         for p in sorted(user_dir.glob("*.md")):
-            try:
-                d = _parse_agent_md(p, source="user")
+            d = _get_from_cache_or_parse(p, source="user")
+            if d:
                 defs[d.name] = d
-            except Exception:
-                pass
 
     # Project-level (overrides user)
     proj_dir = Path.cwd() / ".clawspring" / "agents"
     if proj_dir.is_dir():
         for p in sorted(proj_dir.glob("*.md")):
-            try:
-                d = _parse_agent_md(p, source="project")
+            d = _get_from_cache_or_parse(p, source="project")
+            if d:
                 defs[d.name] = d
-            except Exception:
-                pass
 
     return defs
 

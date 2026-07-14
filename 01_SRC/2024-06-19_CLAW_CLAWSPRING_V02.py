@@ -64,7 +64,6 @@ from __future__ import annotations
 import os
 import re
 import sys
-import random
 if sys.platform == "win32":
     os.system("")  # Enable ANSI escape codes on Windows CMD
     # Corrección Bug #4: UTF-8 en Windows — DEBE ir antes de cualquier print()
@@ -86,8 +85,6 @@ try:
 except ImportError:
     readline = None  # Windows compatibility
 import atexit
-import argparse
-import textwrap
 from pathlib import Path
 from datetime import datetime
 from typing import Optional, Union
@@ -259,6 +256,7 @@ _spinner_phrase = ""
 _spinner_lock = threading.Lock()
 
 def _run_tool_spinner():
+    import random
     """Background spinner on a single line using carriage return."""
     chars = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
     i = 0
@@ -581,6 +579,7 @@ USER FOCUS: {user_topic}
         _fake_factory = Faker()
     except ImportError:
         pass
+        import random
 
     def get_identity(letter):
         if _fake_factory:
@@ -2674,8 +2673,6 @@ def setup_readline(history_file: Path):
 
 def repl(config: dict, initial_prompt: str = None):
     from config import HISTORY_FILE
-    from context import build_system_prompt as _build_system_prompt_orig
-    from agent import AgentState, run, TextChunk, ThinkingChunk, ToolStart, ToolEnd, TurnDone, PermissionRequest
 
     # Personalidad de Claw (opcional — si existe claw_personalidad.py en la carpeta)
     try:
@@ -2754,6 +2751,7 @@ def repl(config: dict, initial_prompt: str = None):
     global _RICH_LIVE
     _RICH_LIVE = _init_rich() and config.get("rich_live", _rich_live_default)
 
+    from agent import AgentState, run, TextChunk, ThinkingChunk, ToolStart, ToolEnd, TurnDone, PermissionRequest
     # Initialize proactive polling state in config (avoids module-level globals)
     config.setdefault("_proactive_enabled", False)
     config.setdefault("_proactive_interval", 300)
@@ -2774,6 +2772,7 @@ def repl(config: dict, initial_prompt: str = None):
             verbose = config.get("verbose", False)
     
             # Rebuild system prompt each turn (picks up cwd changes, etc.)
+            from context import build_system_prompt as _build_system_prompt_orig
             system_prompt = build_system_prompt()
             
             if is_background and not config.get("_telegram_incoming"):
@@ -3341,9 +3340,8 @@ def repl(config: dict, initial_prompt: str = None):
             # Keep conversation history up to the interruption
 
 
-# ── Entry point ────────────────────────────────────────────────────────────
-
 def main():
+    import argparse
     parser = argparse.ArgumentParser(
         prog="clawspring",
         description="ClawSpring — minimal Python Claude Code implementation",

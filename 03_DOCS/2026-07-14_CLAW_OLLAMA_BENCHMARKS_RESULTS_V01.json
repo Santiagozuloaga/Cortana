@@ -1,0 +1,29 @@
+[
+    {
+        "model": "qwen2.5:0.5b",
+        "ttft_ms": 122.92,
+        "tps": 45.14,
+        "total_duration_s": 1.32,
+        "tokens": 54,
+        "mock": true,
+        "timestamp": "2026-07-14 08:04:51"
+    },
+    {
+        "model": "llama3.2:1b",
+        "ttft_ms": 122.93,
+        "tps": 45.13,
+        "total_duration_s": 1.32,
+        "tokens": 54,
+        "mock": true,
+        "timestamp": "2026-07-14 08:04:52"
+    },
+    {
+        "model": "phi3:mini",
+        "ttft_ms": 122.98,
+        "tps": 45.15,
+        "total_duration_s": 1.32,
+        "tokens": 54,
+        "mock": true,
+        "timestamp": "2026-07-14 08:04:53"
+    }
+]

@@ -10,6 +10,9 @@
 | T-2026-07-04-01 | 2026-07-04 | Inicializar repo Git y fijar .gitignore | Completada | Jules |
 | T-2026-07-04-02 | 2026-07-04 | Corregir Bug #7 (env cache en providers.py) | Completada | Jules |
 | T-2026-07-04-03 | 2026-07-04 | Optimizar clawspring.py (SubAgentManager cache) | Completada | Jules |
+| T-2026-07-14-01 | 2026-07-14 | Optimizar inicio de clawspring.py (Lazy Loading) | Completada | Jules |
+| T-2026-07-14-02 | 2026-07-14 | Desarrollar herramienta de benchmark Ollama | Completada | Jules |
+| T-2026-07-14-03 | 2026-07-14 | Auditoría de consistencia del repositorio | Completada | Jules |
 
 ## Historial Consolidado
 Ver `03_DOCS/2026-07-08_CLAW_INFORME_CONSOLIDADO_TOTAL_V01.md` para el registro histórico completo de todas las resoluciones desde Junio 2026.

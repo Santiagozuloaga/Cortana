@@ -1,0 +1,38 @@
+[
+  {
+    "model": "qwen2.5:0.5b",
+    "duration": 0.624,
+    "ttft": 0.0253,
+    "tps": 166.98,
+    "tokens": 100,
+    "success": true,
+    "mode": "profiled"
+  },
+  {
+    "model": "qwen2.5:1.5b",
+    "duration": 1.086,
+    "ttft": 0.0455,
+    "tps": 96.14,
+    "tokens": 100,
+    "success": true,
+    "mode": "profiled"
+  },
+  {
+    "model": "llama3.2:1b",
+    "duration": 1.261,
+    "ttft": 0.0557,
+    "tps": 82.98,
+    "tokens": 100,
+    "success": true,
+    "mode": "profiled"
+  },
+  {
+    "model": "llama3.2:3b",
+    "duration": 1.79,
+    "ttft": 0.086,
+    "tps": 58.7,
+    "tokens": 100,
+    "success": true,
+    "mode": "profiled"
+  }
+]

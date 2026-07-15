@@ -166,7 +166,7 @@ def _has_diff(text: str) -> bool:
 
 # ── Conversation rendering ─────────────────────────────────────────────────
 
-_accumulated_text: list[str] = []   # buffer text during streaming
+_joined_text_cache: str = ""          # cached joined string to avoid O(N^2)
 _current_live: "Live | None" = None  # active Rich Live instance (one at a time)
 _RICH_LIVE = True  # set to False (via config rich_live=false) to disable in-place Live streaming
 
@@ -186,16 +186,17 @@ def _start_live() -> None:
 
 def stream_text(chunk: str) -> None:
     """Buffer chunk; update Live in-place when Rich available, else print directly."""
-    global _current_live
-    _accumulated_text.append(chunk)
+    global _current_live, _joined_text_cache
+    _joined_text_cache += chunk
+
     if _init_rich() and _RICH_LIVE:
         if _current_live is None:
             _start_live()
         # Only update if chunk contains potentially formatting-changing characters
         if any(c in chunk for c in ("#", "*", "`", "_", "[", "\n")):
-            _current_live.update(_make_renderable("".join(_accumulated_text)), refresh=True)
+            _current_live.update(_make_renderable(_joined_text_cache), refresh=True)
         else:
-            _current_live.update(_make_renderable("".join(_accumulated_text)), refresh=False)
+            _current_live.update(_make_renderable(_joined_text_cache), refresh=False)
     else:
         sys.stdout.write(chunk)
         sys.stdout.flush()
@@ -211,17 +212,16 @@ def stream_thinking(chunk: str, verbose: bool):
 
 def flush_response() -> None:
     """Commit buffered text to screen: stop Live (freezes rendered Markdown in place)."""
-    global _current_live
-    full = "".join(_accumulated_text)
-    _accumulated_text.clear()
+    global _current_live, _joined_text_cache
     if _current_live is not None:
         _current_live.stop()
         _current_live = None
-    elif _init_rich() and _RICH_LIVE and full.strip():
+    elif _init_rich() and _RICH_LIVE and _joined_text_cache.strip():
         # Fallback: no Live was running but Rich is available (e.g. after thinking)
-        console.print(_make_renderable(full))
+        console.print(_make_renderable(_joined_text_cache))
     else:
         print()  # ensure newline after plain-text stream
+    _joined_text_cache = ""
 
 _TOOL_SPINNER_PHRASES = [
     "☕ Brewing some coffee...",
@@ -629,13 +629,14 @@ INSTRUCTIONS:
         
         try:
             from providers import TextChunk
+            full_response_str = ""
             for event in stream(curr_model, system_prompt, [{"role": "user", "content": user_msg}], [], internal_config):
                 if isinstance(event, TextChunk):
-                    full_response.append(event.text)
+                    full_response_str += event.text
         except Exception as e:
             return f"Error from Agent {letter}: {e}"
             
-        return "".join(full_response).strip()
+        return full_response_str.strip()
 
     full_log = [f"# Brainstorming Session: {user_topic}", f"**Date:** {time.strftime('%Y-%m-%d %H:%M:%S')}", f"**Model:** {curr_model}", "---"]
     

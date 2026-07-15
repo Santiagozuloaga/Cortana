@@ -1,0 +1,9 @@
+{
+  "model": "ollama/qwen2.5:0.5b",
+  "ttft_ms": 125.4,
+  "tps": 45.2,
+  "total_time_s": 2.5,
+  "tokens": 113,
+  "timestamp": "2026-07-15 08:12:53",
+  "simulated": true
+}

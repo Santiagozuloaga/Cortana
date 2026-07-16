@@ -21,6 +21,7 @@ El repositorio **CLAW_FINAL** está plenamente estabilizado bajo el estándar **
 - **Auditoría ISO-SAGE**: Corrección total de la nomenclatura de archivos en raíz y documentación.
 - **Consolidación P.A.R.A.**: Reubicación de archivos huérfanos y limpieza de la raíz del repositorio.
 - **Reporte Maestro**: Generación del informe consolidado de tareas y chats históricos (`2026-07-08_CLAW_INFORME_CONSOLIDADO_TOTAL_V01.md`).
+- **Reporte de Flujo e IAs**: Consolidación de acciones y roles de las 11 IAs en el flujo de trabajo (`2026-07-08_CLAW_REPORTE_ACCIONES_Y_FLUJO_V02.md`).
 - **Gestión de Symlinks**: Actualización de enlaces simbólicos críticos en raíz y `03_DOCS`.
 
 ## Riesgos Conocidos

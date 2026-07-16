@@ -86,7 +86,6 @@ try:
 except ImportError:
     readline = None  # Windows compatibility
 import atexit
-import argparse
 import textwrap
 from pathlib import Path
 from datetime import datetime
@@ -2744,6 +2743,8 @@ def repl(config: dict, initial_prompt: str = None):
         print()
 
     query_lock = threading.RLock()
+    _sp_cache = {"text": "", "ts": 0}
+    _SP_TTL = 2.0  # seconds
 
     # Apply rich_live config: disable in-place Live streaming if terminal has issues.
     # Auto-detect SSH sessions and dumb terminals where ANSI cursor-up doesn't work.
@@ -2774,7 +2775,12 @@ def repl(config: dict, initial_prompt: str = None):
             verbose = config.get("verbose", False)
     
             # Rebuild system prompt each turn (picks up cwd changes, etc.)
-            system_prompt = build_system_prompt()
+            # Optimized with a short-lived TTL cache to stay under 40ms latency.
+            now = time.time()
+            if now - _sp_cache["ts"] > _SP_TTL:
+                _sp_cache["text"] = build_system_prompt()
+                _sp_cache["ts"] = now
+            system_prompt = _sp_cache["text"]
             
             if is_background and not config.get("_telegram_incoming"):
                 print(clr("\n\n[Background Event Triggered]", "yellow"))
@@ -3344,6 +3350,7 @@ def repl(config: dict, initial_prompt: str = None):
 # ── Entry point ────────────────────────────────────────────────────────────
 
 def main():
+    import argparse
     parser = argparse.ArgumentParser(
         prog="clawspring",
         description="ClawSpring — minimal Python Claude Code implementation",

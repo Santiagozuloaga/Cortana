@@ -1,6 +1,6 @@
 # MASTER STATE - CLAW
 
-## Última Actualización: 2026-07-08
+## Última Actualización: 2026-07-16
 
 ## Estado General
 El repositorio **CLAW_FINAL** está plenamente estabilizado bajo el estándar **P.A.R.A.** y la nomenclatura **ISO-SAGE**. Se ha realizado una auditoría integral que garantiza el 100% de cumplimiento en todos los módulos. El núcleo del sistema es **ClawSpring v3.05.5**.
@@ -17,11 +17,12 @@ El repositorio **CLAW_FINAL** está plenamente estabilizado bajo el estándar **
 - **providers.py**: Abstracción multi-proveedor con caché TTL.
 - **ISO-SAGE Shims**: Puentes funcionales en `01_SRC` para importaciones compatibles.
 
-## Cambios Recientes (2026-07-08)
-- **Auditoría ISO-SAGE**: Corrección total de la nomenclatura de archivos en raíz y documentación.
-- **Consolidación P.A.R.A.**: Reubicación de archivos huérfanos y limpieza de la raíz del repositorio.
-- **Reporte Maestro**: Generación del informe consolidado de tareas y chats históricos (`2026-07-08_CLAW_INFORME_CONSOLIDADO_TOTAL_V01.md`).
-- **Gestión de Symlinks**: Actualización de enlaces simbólicos críticos en raíz y `03_DOCS`.
+## Cambios Recientes (2026-07-16)
+- **Corrección de Git**: Reemplazo del symlink de `.gitignore` por un archivo físico para resolver errores `ELOOP`.
+- **Auditoría Bug #7**: Confirmación de seguridad en el uso de `@lru_cache` y variables de entorno.
+- **Optimización REPL**: Implementación de caché TTL para el system prompt y lazy loading de módulos pesados en `clawspring.py`.
+- **Benchmarks Ollama**: Creación de utilidad de medición de rendimiento (TTFT/TPS) y ejecución de pruebas para `qwen2.5:0.5b`.
+- **Validación Total**: Ejecución exitosa de la batería completa de 239 pruebas automatizadas con 100% de éxito.
 
 ## Riesgos Conocidos
 - La dependencia de symlinks requiere entornos compatibles (Unix/Linux o Windows con Developer Mode).
